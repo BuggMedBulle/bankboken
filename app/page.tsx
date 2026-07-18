@@ -138,7 +138,6 @@ export default function Home() {
     <main className="app-shell">
       <header className="topbar">
         <div><p className="eyebrow">Helo + Halvis</p><h1>Bankboken</h1></div>
-        <button className="lock-button" onClick={() => { sessionStorage.removeItem("bankboken-unlocked"); setUnlocked(false); }} aria-label="Lås Bankboken">Lås</button>
       </header>
 
       <section className="balance-card">
@@ -157,7 +156,7 @@ export default function Home() {
       </section>
 
       <section className="card new-expense">
-        <div className="section-heading"><div><p className="eyebrow">Ny post</p><h2>Lägg till utgift</h2></div><span className="step-pill">01</span></div>
+        <div className="section-heading"><div><p className="eyebrow">Ny post</p><h2>Lägg till utgift</h2></div></div>
         <form onSubmit={addExpense}>
           <label>Beskrivning</label>
           <div className="description-row">
@@ -187,7 +186,7 @@ export default function Home() {
       </section>
 
       <section className="card history-card">
-        <div className="section-heading"><div><p className="eyebrow">Överblick</p><h2>Historik</h2></div><span className="step-pill">{String(expenses.length).padStart(2, "0")}</span></div>
+        <div className="section-heading"><div><p className="eyebrow">Överblick</p><h2>Historik</h2></div></div>
         <div className="totals"><span>Helo <strong>{money.format(heloPaid)} kr</strong></span><span>Halvis <strong>{money.format(halvisPaid)} kr</strong></span><span>Totalt <strong>{money.format(total)} kr</strong></span></div>
         {expenses.length === 0 ? <div className="empty"><span>🧾</span><h3>Inga utgifter ännu</h3><p>Den första utgiften ni lägger till dyker upp här.</p></div> : <div className="expense-list">{expenses.map((expense) => (
           <article className="expense-item" key={expense.id}>

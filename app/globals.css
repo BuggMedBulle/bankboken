@@ -22,7 +22,6 @@ input:focus { border-color:var(--green); box-shadow:0 0 0 4px rgba(125,149,109,.
 .app-shell { width:min(100% - 32px,760px); margin:0 auto; padding:34px 0 64px; }
 .topbar { display:flex; justify-content:space-between; align-items:center; padding:2px 6px 26px; }
 .topbar h1 { font-size:34px; }
-.lock-button { border:1px solid var(--line); background:rgba(255,255,255,.7); padding:10px 16px; border-radius:999px; color:var(--muted); font-size:13px; font-weight:700; }
 .balance-card,.card { background:var(--card); border-radius:30px; box-shadow:0 16px 44px rgba(52,43,26,.08); }
 .balance-card { padding:34px; background:linear-gradient(145deg,#fbfaed,#fff 58%); border:1px solid rgba(227,219,185,.8); }
 .balance-top { display:flex; justify-content:space-between; gap:20px; align-items:flex-start; }
@@ -39,7 +38,6 @@ input:focus { border-color:var(--green); box-shadow:0 0 0 4px rgba(125,149,109,.
 .card { margin-top:24px; padding:34px; }
 .section-heading { display:flex; justify-content:space-between; align-items:flex-start; }
 .section-heading h2 { margin:0; font:700 30px/1.15 Georgia,serif; letter-spacing:-.025em; }
-.step-pill { border:1px solid var(--line); border-radius:999px; padding:8px 11px; color:#9a958b; font-size:11px; font-weight:800; }
 .description-row { display:grid; grid-template-columns:62px 1fr; gap:10px; }
 .icon-wrap { position:relative; }
 .icon-button { width:62px; height:57px; border:0; border-radius:16px; background:#f0ede7; font-size:25px; position:relative; }
