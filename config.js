@@ -24,10 +24,10 @@ export const PASSWORD_SHA256 =
 //   → enable Firestore Database (production mode).
 // See README.md for the security rules to paste.
 export const FIREBASE_CONFIG = {
-  apiKey: "PASTE_ME",
-  authDomain: "PASTE_ME.firebaseapp.com",
-  projectId: "PASTE_ME",
-  storageBucket: "PASTE_ME.appspot.com",
-  messagingSenderId: "PASTE_ME",
-  appId: "PASTE_ME",
+  apiKey: "AIzaSyBDdEDfGulZQ7dedv9TxFIfC9FCoHY0zaY",
+  authDomain: "hh-bankboken.firebaseapp.com",
+  projectId: "hh-bankboken",
+  storageBucket: "hh-bankboken.firebasestorage.app",
+  messagingSenderId: "866961585089",
+  appId: "1:866961585089:web:1bbea0b32c0d7863d0f540",
 };
