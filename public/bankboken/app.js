@@ -89,6 +89,9 @@ const kr0 = (n) =>
 let ENTRIES = [];
 let CURRENT_USER = localStorage.getItem("bankboken-person");
 let APP_INITIALIZED = false;
+let HISTORY_FILTER = null;
+let HISTORY_PAGE = 1;
+const HISTORY_PAGE_SIZE = 20;
 
 function subjectName(personKey) {
   return personKey === CURRENT_USER ? "Du" : PEOPLE[personKey].name;
@@ -134,26 +137,53 @@ function renderHistory() {
   const list = document.getElementById("history-list");
   const empty = document.getElementById("history-empty");
   const totals = document.getElementById("totals");
+  const pagination = document.getElementById("history-pagination");
   list.innerHTML = "";
 
   const hasEntries = ENTRIES.length > 0;
-  empty.hidden = hasEntries;
   totals.hidden = !hasEntries;
+  totals.classList.toggle("is-filtered", Boolean(HISTORY_FILTER));
 
   if (hasEntries) {
     const sum = (who) =>
       ENTRIES.filter((e) => e.type !== "settlement" && e.payer === who).reduce((s, e) => s + e.amount, 0);
     const a = sum("A"), b = sum("B");
     totals.innerHTML = `
-      <span>${subjectName("A")}<b>${kr0(a)}</b></span>
-      <span>${subjectName("B")}<b>${kr0(b)}</b></span>
-      <span>Totalt<b>${kr0(a + b)}</b></span>`;
+      <button type="button" data-filter="A" class="${HISTORY_FILTER === "A" ? "active" : ""}" aria-pressed="${HISTORY_FILTER === "A"}">${subjectName("A")}<b>${kr0(a)}</b></button>
+      <button type="button" data-filter="B" class="${HISTORY_FILTER === "B" ? "active" : ""}" aria-pressed="${HISTORY_FILTER === "B"}">${subjectName("B")}<b>${kr0(b)}</b></button>
+      <button type="button" data-filter="all" aria-label="Visa alla utgifter">Totalt<b>${kr0(a + b)}</b></button>`;
   }
 
-  for (const e of ENTRIES) {
+  const visibleEntries = HISTORY_FILTER
+    ? ENTRIES.filter((entry) => entry.type !== "settlement" && entry.payer === HISTORY_FILTER)
+    : ENTRIES;
+  empty.hidden = visibleEntries.length > 0;
+  empty.textContent = HISTORY_FILTER
+    ? `Inga utgifter för ${subjectName(HISTORY_FILTER)}.`
+    : "Inga utgifter än. Lägg till er första ovan.";
+
+  const pageCount = Math.max(1, Math.ceil(visibleEntries.length / HISTORY_PAGE_SIZE));
+  HISTORY_PAGE = Math.min(HISTORY_PAGE, pageCount);
+  const pageStart = (HISTORY_PAGE - 1) * HISTORY_PAGE_SIZE;
+  const pageEntries = visibleEntries.slice(pageStart, pageStart + HISTORY_PAGE_SIZE);
+  pagination.hidden = visibleEntries.length <= HISTORY_PAGE_SIZE;
+  document.getElementById("history-page-status").textContent = `Sida ${HISTORY_PAGE} av ${pageCount}`;
+  document.getElementById("history-prev").disabled = HISTORY_PAGE === 1;
+  document.getElementById("history-next").disabled = HISTORY_PAGE === pageCount;
+
+  let renderedDate = null;
+  for (const e of pageEntries) {
     const li = document.createElement("li");
     const who = PEOPLE[e.payer] ? subjectName(e.payer) : e.payer;
-    const date = new Date(e.ts).toLocaleDateString("sv-SE", { day: "numeric", month: "short" });
+    const date = new Date(e.ts).toLocaleDateString("sv-SE", { day: "numeric", month: "long" });
+
+    if (date !== renderedDate) {
+      const marker = document.createElement("li");
+      marker.className = "history-date-marker";
+      marker.textContent = date;
+      list.appendChild(marker);
+      renderedDate = date;
+    }
 
     if (e.type === "settlement") {
       const recipientKey = e.payer === "A" ? "B" : "A";
@@ -164,7 +194,6 @@ function renderHistory() {
         <div class="h-main">
           <div class="h-title">Reglering</div>
           <div class="h-sub">${who} betalade ${to}</div>
-          <div class="h-date">${date}</div>
         </div>
         <div class="h-amt">${kr(e.amount)}</div>`;
     } else {
@@ -178,25 +207,29 @@ function renderHistory() {
         <div class="h-main">
           <div class="h-title">${escapeHtml(e.desc)}</div>
           <div class="h-sub">${who} betalade · ${split}</div>
-          <div class="h-date">${date}</div>
         </div>
         <div class="h-amt">${kr(e.amount)}</div>`;
     }
     if (e.type !== "settlement") {
-      const edit = document.createElement("button");
-      edit.className = "h-edit";
-      edit.innerHTML = '<img src="edit.svg" alt="" />';
-      edit.title = "Redigera";
-      edit.setAttribute("aria-label", `Redigera ${e.desc}`);
-      edit.onclick = () => startEditing(e);
-      li.appendChild(edit);
+      li.classList.add("h-expense");
+      li.tabIndex = 0;
+      li.setAttribute("role", "button");
+      li.setAttribute("aria-label", `Redigera ${e.desc}`);
+      li.onclick = () => startEditing(e);
+      li.onkeydown = (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          startEditing(e);
+        }
+      };
+    } else {
+      const del = document.createElement("button");
+      del.className = "h-del";
+      del.innerHTML = '<img src="delete.svg" alt="" />';
+      del.title = "Ta bort";
+      del.onclick = () => { if (confirm("Ta bort denna post?")) store.remove(e.id); };
+      li.appendChild(del);
     }
-    const del = document.createElement("button");
-    del.className = "h-del";
-    del.innerHTML = '<img src="delete.svg" alt="" />';
-    del.title = "Ta bort";
-    del.onclick = () => { if (confirm("Ta bort denna post?")) store.remove(e.id); };
-    li.appendChild(del);
     list.appendChild(li);
   }
 }
@@ -362,6 +395,8 @@ function dateInputValue(timestamp) {
 
 function resetExpenseForm() {
   const form = document.getElementById("expense-form");
+  document.getElementById("expense-form-home").appendChild(form);
+  document.getElementById("edit-modal").hidden = true;
   EDITING_ID = null;
   form.reset();
   document.getElementById("e-date").value = todayInputValue();
@@ -373,6 +408,7 @@ function resetExpenseForm() {
   document.getElementById("submit-icon").textContent = "+";
   document.getElementById("submit-label").textContent = "Lägg till utgift";
   document.getElementById("edit-cancel").hidden = true;
+  document.getElementById("edit-delete").hidden = true;
   updateCustomSplitLabels();
   setIcon(ICON_DEFAULT);
   closeIconPop();
@@ -381,6 +417,8 @@ function resetExpenseForm() {
 
 function startEditing(entry) {
   EDITING_ID = entry.id;
+  document.getElementById("edit-form-modal").appendChild(document.getElementById("expense-form"));
+  document.getElementById("edit-modal").hidden = false;
   document.getElementById("e-desc").value = entry.desc;
   document.getElementById("e-amount").value = entry.amount;
   document.getElementById("e-date").value = dateInputValue(entry.ts);
@@ -391,13 +429,13 @@ function startEditing(entry) {
     : "50";
   document.getElementById("custom-split").hidden = entry.split !== "custom";
   setIcon(entry.icon || ICON_DEFAULT);
-  document.getElementById("expense-heading").textContent = "Redigera utgift";
   document.getElementById("submit-icon").textContent = "✓";
   document.getElementById("submit-label").textContent = "Spara ändringar";
   document.getElementById("edit-cancel").hidden = false;
+  document.getElementById("edit-delete").hidden = false;
   updateCustomSplitLabels();
   updatePreview();
-  document.getElementById("expense-heading").scrollIntoView({ behavior: "smooth", block: "start" });
+  document.getElementById("e-desc").focus();
 }
 
 function updatePreview() {
@@ -460,6 +498,40 @@ function initApp() {
   });
 
   document.getElementById("edit-cancel").addEventListener("click", resetExpenseForm);
+  document.getElementById("edit-delete").addEventListener("click", async () => {
+    if (!EDITING_ID || !confirm("Ta bort detta utlägg?")) return;
+    await store.remove(EDITING_ID);
+    resetExpenseForm();
+  });
+
+  document.getElementById("edit-modal").addEventListener("click", (event) => {
+    if (event.target === event.currentTarget) resetExpenseForm();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !document.getElementById("edit-modal").hidden) resetExpenseForm();
+  });
+
+  document.getElementById("totals").addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-filter]");
+    if (!button) return;
+    const filter = button.dataset.filter;
+    HISTORY_FILTER = filter === "all" || HISTORY_FILTER === filter ? null : filter;
+    HISTORY_PAGE = 1;
+    renderHistory();
+  });
+
+  document.getElementById("history-prev").addEventListener("click", () => {
+    if (HISTORY_PAGE <= 1) return;
+    HISTORY_PAGE -= 1;
+    renderHistory();
+    document.getElementById("totals").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  document.getElementById("history-next").addEventListener("click", () => {
+    HISTORY_PAGE += 1;
+    renderHistory();
+    document.getElementById("totals").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 
   document.getElementById("settle-btn").addEventListener("click", onSettleClick);
   document.getElementById("confirm-settle").addEventListener("click", confirmSettlement);
@@ -485,7 +557,7 @@ async function unlock() {
 async function enterApp() {
   document.getElementById("identity").hidden = true;
   document.getElementById("app").hidden = false;
-  document.getElementById("identity-change").textContent = PEOPLE[CURRENT_USER].name;
+  document.getElementById("identity-name").textContent = PEOPLE[CURRENT_USER].name;
   if (APP_INITIALIZED) {
     updatePersonLabels();
     setActive("e-payer", currentPersonName());

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=expense-editing-1" />
+  <link rel="stylesheet" href="styles.css?v=history-modal-1" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📒</text></svg>" />
 </head>
 <body>
@@ -40,8 +40,8 @@
     <header class="app-head">
       <span class="brand">Bankboken</span>
       <div class="app-meta">
-        <button id="identity-change" type="button"></button>
-        <span id="sync-dot" class="sync" title="Ansluter…">●</span>
+        <button id="identity-change" type="button"><span id="identity-name"></span><img src="switch.svg" alt="" /></button>
+        <span id="sync-dot" class="sync" title="Ansluter…" hidden></span>
       </div>
     </header>
 
@@ -64,6 +64,7 @@
       <!-- Ny utgift -->
       <section class="card">
         <h2 id="expense-heading">Ny utgift</h2>
+        <div id="expense-form-home">
         <form id="expense-form">
           <div class="field">
             <span class="field-label">Beskrivning</span>
@@ -72,16 +73,18 @@
                       aria-haspopup="true" aria-expanded="false" title="Välj kategori">🧾</button>
               <input id="e-desc" type="text" placeholder="t.ex. Matvaror ICA" required maxlength="60" />
               <div id="icon-pop" class="icon-pop" hidden>
-                <button type="button" data-icon="🛒" title="Matvaror">🛒</button>
-                <button type="button" data-icon="🍽️" title="Restaurang">🍽️</button>
-                <button type="button" data-icon="🍺" title="Alkohol">🍺</button>
-                <button type="button" data-icon="⛽" title="Bensin">⛽</button>
-                <button type="button" data-icon="✈️" title="Resa">✈️</button>
-                <button type="button" data-icon="☕" title="Fika">☕</button>
-                <button type="button" data-icon="🏠" title="Hem">🏠</button>
-                <button type="button" data-icon="🎬" title="Nöje">🎬</button>
-                <button type="button" data-icon="🛍️" title="Shopping">🛍️</button>
                 <button type="button" data-icon="🧾" title="Övrigt">🧾</button>
+                <button type="button" data-icon="🛒" title="Mat">🛒</button>
+                <button type="button" data-icon="🍽️" title="Lunch eller middag">🍽️</button>
+                <button type="button" data-icon="🎬" title="Bio">🎬</button>
+                <button type="button" data-icon="🍿" title="Snacks eller godis">🍿</button>
+                <button type="button" data-icon="🍷" title="Alkohol">🍷</button>
+                <button type="button" data-icon="🚌" title="Kollektivtrafik">🚌</button>
+                <button type="button" data-icon="🚕" title="Taxi">🚕</button>
+                <button type="button" data-icon="🏟️" title="Live-sport">🏟️</button>
+                <button type="button" data-icon="⛽" title="Bensin">⛽</button>
+                <button type="button" data-icon="🛍️" title="Shopping">🛍️</button>
+                <button type="button" data-icon="🗺️" title="Upplevelser eller utflykter">🗺️</button>
               </div>
             </div>
           </div>
@@ -132,11 +135,15 @@
             </div>
           </div>
 
-          <button type="submit" class="btn-primary"><span class="btn-icon" id="submit-icon" aria-hidden="true">+</span><span id="submit-label">Lägg till utgift</span></button>
-          <button type="button" class="edit-cancel" id="edit-cancel" hidden>Avbryt redigering</button>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary"><span class="btn-icon" id="submit-icon" aria-hidden="true">+</span><span id="submit-label">Lägg till utgift</span></button>
+            <button type="button" class="edit-action edit-cancel" id="edit-cancel" aria-label="Avbryt redigering" title="Avbryt redigering" hidden><img src="modal-close.svg" alt="" /></button>
+            <button type="button" class="edit-action edit-delete" id="edit-delete" aria-label="Ta bort utlägg" title="Ta bort utlägg" hidden><img src="trash.svg" alt="" /></button>
+          </div>
 
           <p class="preview" id="split-preview" hidden></p>
         </form>
+        </div>
       </section>
 
       <!-- Historik -->
@@ -144,11 +151,23 @@
         <h2>Historik</h2>
         <p class="totals" id="totals" hidden></p>
         <ul id="history-list" class="history"></ul>
+        <nav id="history-pagination" class="history-pagination" aria-label="Historiksidor" hidden>
+          <button type="button" id="history-prev" aria-label="Föregående sida">←</button>
+          <span id="history-page-status"></span>
+          <button type="button" id="history-next" aria-label="Nästa sida">→</button>
+        </nav>
         <p id="history-empty" class="empty">Inga utgifter än. Lägg till er första ovan.</p>
       </section>
     </main>
   </div>
 
-  <script type="module" src="app.js?v=expense-editing-1"></script>
+  <div id="edit-modal" class="edit-modal" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title" hidden>
+    <div class="edit-modal-card">
+      <h2 id="edit-modal-title">Redigera utgift</h2>
+      <div id="edit-form-modal"></div>
+    </div>
+  </div>
+
+  <script type="module" src="app.js?v=history-modal-1"></script>
 </body>
 </html>
