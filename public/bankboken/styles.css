@@ -133,7 +133,13 @@ button { font-family: inherit; cursor: pointer; }
   background: var(--field); border: 1px solid transparent; border-radius: var(--r-field);
   color: var(--ink);
 }
-#expense-form input[type="date"] { min-height: 54px; font-family: inherit; }
+#expense-form input[type="date"] {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 54px;
+  font-family: inherit;
+}
 #expense-form input::placeholder { color: var(--ink-3); }
 #expense-form input:focus { outline: none; border-color: var(--ink); }
 
