@@ -109,16 +109,32 @@
 
           <div class="field">
             <span class="field-label">Delning</span>
-            <div class="seg" id="e-split">
-              <button type="button" data-val="a">100% Helo</button>
-              <button type="button" data-val="even" class="active">50 / 50</button>
-              <button type="button" data-val="b">100% Halvis</button>
+            <div class="split-picker" id="e-split">
+              <div class="seg split-presets">
+                <button type="button" data-val="a">100% Helo</button>
+                <button type="button" data-val="even" class="active">50 / 50</button>
+                <button type="button" data-val="b">100% Halvis</button>
+              </div>
+              <button type="button" class="custom-split-button" data-val="custom">Anpassad</button>
+            </div>
+            <div id="custom-split" class="custom-split" hidden>
+              <div class="custom-split-labels">
+                <span class="custom-split-label">
+                  <strong id="custom-a-name">Helo</strong>
+                  <span id="custom-a-value">50% · 0,00 kr</span>
+                </span>
+                <span class="custom-split-label custom-split-label-right">
+                  <strong id="custom-b-name">Halvis</strong>
+                  <span id="custom-b-value">50% · 0,00 kr</span>
+                </span>
+              </div>
+              <input id="e-custom-share" type="range" min="0" max="100" step="1" value="50" aria-label="Halvis andel" />
             </div>
           </div>
 
-          <p class="preview" id="split-preview" hidden></p>
+          <button type="submit" class="btn-primary"><span class="btn-icon" aria-hidden="true">+</span>Lägg till utgift</button>
 
-          <button type="submit" class="btn-primary">Lägg till utgift</button>
+          <p class="preview" id="split-preview" hidden></p>
         </form>
       </section>
 

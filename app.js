@@ -56,6 +56,10 @@ function setSync(ok, title) {
 function sharesOf(e) {
   if (e.split === "a") return { a: e.amount, b: 0 };        // Helo bears all
   if (e.split === "b") return { a: 0, b: e.amount };        // Halvis bears all
+  if (e.split === "custom") {
+    const shareA = Math.min(1, Math.max(0, Number(e.shareA) || 0));
+    return { a: e.amount * shareA, b: e.amount * (1 - shareA) };
+  }
   return { a: e.amount / 2, b: e.amount / 2 };              // 50/50
 }
 
@@ -164,7 +168,9 @@ function renderHistory() {
     } else {
       const split =
         e.split === "a" ? `100% ${subjectName("A")}` :
-        e.split === "b" ? `100% ${subjectName("B")}` : "50/50";
+        e.split === "b" ? `100% ${subjectName("B")}` :
+        e.split === "custom" ? `${Math.round((e.shareA || 0) * 100)}% ${subjectName("A")} / ${Math.round((1 - (e.shareA || 0)) * 100)}% ${subjectName("B")}` :
+        "50/50";
       li.innerHTML = `
         <div class="h-ico">${e.icon || "🧾"}</div>
         <div class="h-main">
@@ -291,6 +297,30 @@ function updatePersonLabels() {
   document.querySelector('#e-payer [data-val="Halvis"]').textContent = subjectName("B");
   document.querySelector('#e-split [data-val="a"]').textContent = `100% ${subjectName("A")}`;
   document.querySelector('#e-split [data-val="b"]').textContent = `100% ${subjectName("B")}`;
+  updateCustomSplitLabels();
+}
+
+function customShareA() {
+  return 1 - Number(document.getElementById("e-custom-share").value) / 100;
+}
+
+function updateCustomSplitLabels() {
+  const slider = document.getElementById("e-custom-share");
+  const sliderPosition = Number(slider.value);
+  const fillStart = Math.min(50, sliderPosition);
+  const fillEnd = Math.max(50, sliderPosition);
+  slider.style.background = `linear-gradient(to right, var(--ink-3) 0 ${fillStart}%, var(--ink) ${fillStart}% ${fillEnd}%, var(--ink-3) ${fillEnd}% 100%)`;
+  const percentA = Math.round(customShareA() * 100);
+  const amount = parseFloat(document.getElementById("e-amount").value) || 0;
+  document.getElementById("custom-a-name").textContent = subjectName("A");
+  document.getElementById("custom-b-name").textContent = subjectName("B");
+  document.getElementById("custom-a-value").textContent = `${percentA}% · ${kr(amount * percentA / 100)}`;
+  document.getElementById("custom-b-value").textContent = `${100 - percentA}% · ${kr(amount * (100 - percentA) / 100)}`;
+}
+
+function onSplitChange(split) {
+  document.getElementById("custom-split").hidden = split !== "custom";
+  updatePreview();
 }
 
 function todayInputValue() {
@@ -312,13 +342,14 @@ function expenseTimestamp(dateValue) {
 
 function updatePreview() {
   const amount = parseFloat(document.getElementById("e-amount").value) || 0;
+  updateCustomSplitLabels();
   const split = getSplit(); // 'a' | 'even' | 'b'
   const payer = payerKey();
   const other = payer === "A" ? "B" : "A";
   const el = document.getElementById("split-preview");
 
   if (amount <= 0) { el.hidden = true; return; }
-  const shares = sharesOf({ amount, split });
+  const shares = sharesOf({ amount, split, shareA: customShareA() });
   const owes = payerKey() === "A" ? shares.b : shares.a; // what the non-payer owes
   el.hidden = false;
   el.textContent = owes <= 0
@@ -328,13 +359,17 @@ function updatePreview() {
 
 function initApp() {
   getPayer = initSegments("e-payer", updatePreview);
-  getSplit = initSegments("e-split", updatePreview);
+  getSplit = initSegments("e-split", onSplitChange);
   initIconPicker();
 
   const dateInput = document.getElementById("e-date");
   dateInput.value = todayInputValue();
 
   document.getElementById("e-amount").addEventListener("input", updatePreview);
+  document.getElementById("e-custom-share").addEventListener("input", () => {
+    updateCustomSplitLabels();
+    updatePreview();
+  });
 
   // Config-driven labels
   const pA = document.querySelector('#e-payer [data-val="Helo"]');
@@ -350,14 +385,20 @@ function initApp() {
     const amount = parseFloat(document.getElementById("e-amount").value);
     const date = dateInput.value;
     if (!desc || !(amount > 0) || !date) return;
+    const split = getSplit();
     await store.add({
       type: "expense", desc, amount, icon: getIcon(),
-      payer: payerKey(), split: getSplit(), ts: expenseTimestamp(date),
+      payer: payerKey(), split,
+      shareA: split === "custom" ? customShareA() : null,
+      ts: expenseTimestamp(date),
     });
     ev.target.reset();
     dateInput.value = todayInputValue();
     setActive("e-payer", currentPersonName());
     setActive("e-split", "even");
+    document.getElementById("e-custom-share").value = "50";
+    document.getElementById("custom-split").hidden = true;
+    updateCustomSplitLabels();
     setIcon(ICON_DEFAULT);
     closeIconPop();
     updatePreview();
