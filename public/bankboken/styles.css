@@ -227,6 +227,7 @@ button { font-family: inherit; cursor: pointer; }
 .h-main { flex: 1; min-width: 0; }
 .h-title { font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .h-sub { color: var(--ink-2); font-size: 0.82rem; margin-top: 2px; }
+.h-date { color: var(--ink-3); font-size: 0.76rem; margin-top: 3px; }
 .h-amt { font-family: var(--font-num); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .h-del {
   background: transparent; border: none; color: var(--ink-3);

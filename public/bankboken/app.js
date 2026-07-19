@@ -159,7 +159,8 @@ function renderHistory() {
         <div class="h-ico">💸</div>
         <div class="h-main">
           <div class="h-title">Reglering</div>
-          <div class="h-sub">${who} betalade ${to} · ${date}</div>
+          <div class="h-sub">${who} betalade ${to}</div>
+          <div class="h-date">${date}</div>
         </div>
         <div class="h-amt">${kr(e.amount)}</div>`;
     } else {
@@ -170,7 +171,8 @@ function renderHistory() {
         <div class="h-ico">${e.icon || "🧾"}</div>
         <div class="h-main">
           <div class="h-title">${escapeHtml(e.desc)}</div>
-          <div class="h-sub">${who} betalade · ${split} · ${date}</div>
+          <div class="h-sub">${who} betalade · ${split}</div>
+          <div class="h-date">${date}</div>
         </div>
         <div class="h-amt">${kr(e.amount)}</div>`;
     }
