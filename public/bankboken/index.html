@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#efede9" />
+  <title>Bankboken</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📒</text></svg>" />
+</head>
+<body>
+  <!-- ============ LOCK SCREEN ============ -->
+  <div id="lock" class="lock">
+    <div class="lock-card">
+      <div class="lock-emoji">📒</div>
+      <h1>Bankboken</h1>
+      <p class="sub">Helo &amp; Halvis</p>
+      <form id="lock-form" autocomplete="off">
+        <input id="pw" type="password" placeholder="Lösenord" aria-label="Lösenord" />
+        <button type="submit">Lås upp</button>
+      </form>
+      <p id="lock-error" class="error" hidden>Fel lösenord</p>
+    </div>
+  </div>
+
+  <!-- ============ APP ============ -->
+  <div id="app" hidden>
+    <header class="app-head">
+      <span class="brand">📒 Bankboken</span>
+      <span id="sync-dot" class="sync" title="Ansluter…">●</span>
+    </header>
+
+    <main class="stack">
+      <!-- Saldo -->
+      <section class="card" id="saldo-card">
+        <p class="eyebrow">Saldo</p>
+        <h1 id="balance-heading">Läser in…</h1>
+        <p class="sub" id="balance-sub"></p>
+
+        <button id="settle-btn" class="btn-swish" aria-label="Reglera med Swish" disabled>
+          <img class="swish-logo-img" src="swish-logo.svg" alt="Swish" />
+        </button>
+
+        <div id="settle-panel" class="settle-panel" hidden>
+          <div id="qr" class="qr"></div>
+          <p class="hint">Låt den andra skanna med Swish-appen</p>
+          <a id="swish-open" class="btn-swish-open" href="#" rel="noopener">Öppna Swish på den här telefonen</a>
+        </div>
+      </section>
+
+      <!-- Ny utgift -->
+      <section class="card">
+        <h2>Ny utgift</h2>
+        <form id="expense-form">
+          <div class="field">
+            <span class="field-label">Beskrivning</span>
+            <div class="desc-row">
+              <button type="button" id="icon-trigger" class="icon-trigger"
+                      aria-haspopup="true" aria-expanded="false" title="Välj kategori">🧾</button>
+              <input id="e-desc" type="text" placeholder="t.ex. Matvaror ICA" required maxlength="60" />
+              <div id="icon-pop" class="icon-pop" hidden>
+                <button type="button" data-icon="🛒" title="Matvaror">🛒</button>
+                <button type="button" data-icon="🍽️" title="Restaurang">🍽️</button>
+                <button type="button" data-icon="🍺" title="Alkohol">🍺</button>
+                <button type="button" data-icon="⛽" title="Bensin">⛽</button>
+                <button type="button" data-icon="✈️" title="Resa">✈️</button>
+                <button type="button" data-icon="☕" title="Fika">☕</button>
+                <button type="button" data-icon="🏠" title="Hem">🏠</button>
+                <button type="button" data-icon="🎬" title="Nöje">🎬</button>
+                <button type="button" data-icon="🛍️" title="Shopping">🛍️</button>
+                <button type="button" data-icon="🧾" title="Övrigt">🧾</button>
+              </div>
+            </div>
+          </div>
+
+          <label class="field">
+            <span class="field-label">Belopp</span>
+            <div class="input-wrap">
+              <input id="e-amount" type="number" inputmode="decimal" step="0.01" min="0.01" placeholder="0" required />
+              <span class="suffix">kr</span>
+            </div>
+          </label>
+
+          <div class="field">
+            <span class="field-label">Betalat av</span>
+            <div class="seg" id="e-payer">
+              <button type="button" data-val="Helo" class="active">Helo</button>
+              <button type="button" data-val="Halvis">Halvis</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="field-label">Delning</span>
+            <div class="seg" id="e-split">
+              <button type="button" data-val="a">100% Helo</button>
+              <button type="button" data-val="even" class="active">50 / 50</button>
+              <button type="button" data-val="b">100% Halvis</button>
+            </div>
+          </div>
+
+          <p class="preview" id="split-preview" hidden></p>
+
+          <button type="submit" class="btn-primary">Lägg till utgift</button>
+        </form>
+      </section>
+
+      <!-- Historik -->
+      <section class="card">
+        <h2>Historik</h2>
+        <p class="totals" id="totals" hidden></p>
+        <ul id="history-list" class="history"></ul>
+        <p id="history-empty" class="empty">Inga utgifter än. Lägg till er första ovan.</p>
+      </section>
+    </main>
+  </div>
+
+  <script src="vendor/qrcode.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
