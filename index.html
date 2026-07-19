@@ -24,11 +24,25 @@
     </div>
   </div>
 
+  <div id="identity" class="lock" hidden>
+    <div class="lock-card identity-card">
+      <h1>Bankboken</h1>
+      <p>Vem är du på den här enheten?</p>
+      <div class="identity-options">
+        <button type="button" data-person="A">Helo</button>
+        <button type="button" data-person="B">Halvis</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ============ APP ============ -->
   <div id="app" hidden>
     <header class="app-head">
       <span class="brand">Bankboken</span>
-      <span id="sync-dot" class="sync" title="Ansluter…">●</span>
+      <div class="app-meta">
+        <button id="identity-change" type="button"></button>
+        <span id="sync-dot" class="sync" title="Ansluter…">●</span>
+      </div>
     </header>
 
     <main class="stack">
@@ -38,7 +52,7 @@
         <h1 id="balance-heading">Läser in…</h1>
         <p class="sub" id="balance-sub"></p>
 
-        <button id="settle-btn" class="btn-swish" aria-label="Reglera med Swish" disabled>
+        <button id="settle-btn" class="btn-swish" aria-label="Reglera med Swish" hidden>
           <img class="swish-logo-img" src="swish-logo.svg" alt="Swish" />
         </button>
 

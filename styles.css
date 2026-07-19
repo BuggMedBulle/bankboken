@@ -67,6 +67,9 @@ button { font-family: inherit; cursor: pointer; }
 }
 .lock-card button:active { transform: scale(0.99); }
 .error { color: var(--danger); font-size: 0.9rem; margin: 12px 0 0; }
+.identity-card p { margin: -12px 0 20px; color: var(--ink-2); }
+.identity-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.identity-options button { border-radius: var(--r-field); }
 
 /* ============ SHELL ============ */
 #app { max-width: 520px; margin: 0 auto; padding: 10px 16px 40px; }
@@ -75,6 +78,11 @@ button { font-family: inherit; cursor: pointer; }
   padding: 10px 6px 14px;
 }
 .brand { font-family: "Climate Crisis", sans-serif; font-weight: 400; font-size: 1rem; letter-spacing: -0.02em; }
+.app-meta { display: flex; align-items: center; gap: 9px; }
+#identity-change {
+  border: 0; border-radius: var(--r-pill); padding: 6px 10px;
+  background: var(--field); color: var(--ink-2); font-size: 0.72rem; font-weight: 600;
+}
 .sync { color: var(--ink-3); font-size: 0.6rem; }
 
 .stack { display: grid; gap: 20px; }

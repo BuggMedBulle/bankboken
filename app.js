@@ -81,6 +81,8 @@ const kr0 = (n) =>
 //  RENDER
 // ============================================================
 let ENTRIES = [];
+let CURRENT_USER = localStorage.getItem("bankboken-person");
+let APP_INITIALIZED = false;
 
 function render() { renderBalance(); renderHistory(); }
 
@@ -92,22 +94,25 @@ function renderBalance() {
   const panel = document.getElementById("settle-panel");
 
   panel.hidden = true;
+  btn.hidden = true;
 
   if (Math.abs(bal) < 0.01) {
     heading.textContent = kr(0);
     sub.textContent = "Allt är jämnt. Ingen är skyldig något.";
-    btn.disabled = true;
     return;
   }
 
-  const debtor = bal > 0 ? PEOPLE.B : PEOPLE.A;
-  const creditor = bal > 0 ? PEOPLE.A : PEOPLE.B;
+  const debtorKey = bal > 0 ? "B" : "A";
+  const creditorKey = bal > 0 ? "A" : "B";
+  const debtor = PEOPLE[debtorKey];
+  const creditor = PEOPLE[creditorKey];
   const owed = Math.abs(bal);
 
   heading.textContent = kr(owed);
   sub.innerHTML = `<strong>${escapeHtml(debtor.name)}</strong> är skyldig ${escapeHtml(creditor.name)}`;
-  btn.disabled = false;
+  if (CURRENT_USER !== debtorKey) return;
 
+  btn.hidden = false;
   btn.dataset.payee = creditor.swish;
   btn.dataset.amount = owed.toFixed(2);
   btn.dataset.msg = `Reglering ${debtor.name} till ${creditor.name}`;
@@ -183,7 +188,7 @@ const buildSwishLink = (payee, amount, msg) =>
 
 function onSettleClick() {
   const btn = document.getElementById("settle-btn");
-  if (btn.disabled) return;
+  if (btn.hidden) return;
   const { payee, amount, msg } = btn.dataset;
   const link = buildSwishLink(payee, amount, msg);
 
@@ -195,6 +200,7 @@ async function confirmSettlement() {
   const bal = balanceOf(ENTRIES);
   if (Math.abs(bal) < 0.01) return;
   const payer = bal > 0 ? "B" : "A";
+  if (CURRENT_USER !== payer) return;
   await store.add({
     type: "settlement", payer, amount: Math.abs(bal), ts: Date.now(),
   });
@@ -263,6 +269,7 @@ function initIconPicker() {
 }
 
 function payerKey() { return getPayer() === PEOPLE.A.name ? "A" : "B"; }
+function currentPersonName() { return PEOPLE[CURRENT_USER]?.name || PEOPLE.A.name; }
 
 function todayInputValue() {
   const now = new Date();
@@ -312,6 +319,7 @@ function initApp() {
   const pB = document.querySelector('#e-payer [data-val="Halvis"]');
   pA.textContent = PEOPLE.A.name; pA.dataset.val = PEOPLE.A.name;
   pB.textContent = PEOPLE.B.name; pB.dataset.val = PEOPLE.B.name;
+  setActive("e-payer", currentPersonName());
   document.querySelector('#e-split [data-val="a"]').textContent = `100% ${PEOPLE.A.name}`;
   document.querySelector('#e-split [data-val="b"]').textContent = `100% ${PEOPLE.B.name}`;
 
@@ -327,7 +335,7 @@ function initApp() {
     });
     ev.target.reset();
     dateInput.value = todayInputValue();
-    setActive("e-payer", PEOPLE.A.name);
+    setActive("e-payer", currentPersonName());
     setActive("e-split", "even");
     setIcon(ICON_DEFAULT);
     closeIconPop();
@@ -349,11 +357,40 @@ async function sha256(str) {
 
 async function unlock() {
   document.getElementById("lock").hidden = true;
+  if (!CURRENT_USER) {
+    document.getElementById("identity").hidden = false;
+    return;
+  }
+  await enterApp();
+}
+
+async function enterApp() {
+  document.getElementById("identity").hidden = true;
   document.getElementById("app").hidden = false;
+  document.getElementById("identity-change").textContent = PEOPLE[CURRENT_USER].name;
+  if (APP_INITIALIZED) {
+    setActive("e-payer", currentPersonName());
+    render();
+    return;
+  }
   await initStore();
   store.subscribe((entries) => { ENTRIES = entries; render(); });
   initApp();
+  APP_INITIALIZED = true;
 }
+
+document.getElementById("identity").addEventListener("click", async (event) => {
+  const button = event.target.closest("[data-person]");
+  if (!button) return;
+  CURRENT_USER = button.dataset.person;
+  localStorage.setItem("bankboken-person", CURRENT_USER);
+  await enterApp();
+});
+
+document.getElementById("identity-change").addEventListener("click", () => {
+  document.getElementById("app").hidden = true;
+  document.getElementById("identity").hidden = false;
+});
 
 document.getElementById("lock-form").addEventListener("submit", async (ev) => {
   ev.preventDefault();
