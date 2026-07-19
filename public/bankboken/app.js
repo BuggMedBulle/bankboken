@@ -334,12 +334,9 @@ document.getElementById("lock-form").addEventListener("submit", async (ev) => {
   ev.preventDefault();
   const err = document.getElementById("lock-error");
   if ((await sha256(document.getElementById("pw").value)) === PASSWORD_SHA256) {
-    sessionStorage.setItem("hepa-unlocked", "1");
     unlock();
   } else {
     err.hidden = false;
     document.getElementById("pw").value = "";
   }
 });
-
-if (sessionStorage.getItem("hepa-unlocked") === "1") unlock();
