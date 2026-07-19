@@ -112,7 +112,6 @@ function renderBalance() {
 
   const debtorKey = bal > 0 ? "B" : "A";
   const creditorKey = bal > 0 ? "A" : "B";
-  const debtor = PEOPLE[debtorKey];
   const creditor = PEOPLE[creditorKey];
   const owed = Math.abs(bal);
 
@@ -123,7 +122,6 @@ function renderBalance() {
   btn.hidden = false;
   btn.dataset.payee = creditor.swish;
   btn.dataset.amount = owed.toFixed(2);
-  btn.dataset.msg = `Reglering ${debtor.name} till ${creditor.name}`;
 }
 
 function renderHistory() {
@@ -194,14 +192,20 @@ function escapeHtml(s) {
 // ============================================================
 //  SWISH
 // ============================================================
+const settlementMessage = () => {
+  const date = new Intl.DateTimeFormat("sv-SE", { day: "numeric", month: "long" }).format(new Date());
+  return `Bankboken - reglering ${date}`;
+};
+
 const buildSwishLink = (payee, amount, msg) =>
-  `https://app.swish.nu/1/p/sw/?${new URLSearchParams({ sw: payee, amt: amount, cur: "SEK", msg })}`;
+  `https://app.swish.nu/1/p/sw/?sw=${encodeURIComponent(payee)}` +
+  `&amt=${encodeURIComponent(amount)}&cur=SEK&msg=${encodeURIComponent(msg)}`;
 
 function onSettleClick() {
   const btn = document.getElementById("settle-btn");
   if (btn.hidden) return;
-  const { payee, amount, msg } = btn.dataset;
-  const link = buildSwishLink(payee, amount, msg);
+  const { payee, amount } = btn.dataset;
+  const link = buildSwishLink(payee, amount, settlementMessage());
 
   document.getElementById("settle-panel").hidden = false;
   window.open(link, "_blank", "noopener,noreferrer");
