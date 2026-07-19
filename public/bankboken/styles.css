@@ -128,11 +128,13 @@ button { font-family: inherit; cursor: pointer; }
 .field { display: block; margin-bottom: 16px; }
 .field-label { display: block; margin: 0 2px 8px; color: var(--ink-2); font-size: 0.9rem; }
 #expense-form input[type="text"],
-#expense-form input[type="number"] {
+#expense-form input[type="number"],
+#expense-form input[type="date"] {
   width: 100%; padding: 15px 16px; font-size: 1.05rem;
   background: var(--field); border: 1px solid transparent; border-radius: var(--r-field);
   color: var(--ink);
 }
+#expense-form input[type="date"] { min-height: 54px; font-family: inherit; }
 #expense-form input::placeholder { color: var(--ink-3); }
 #expense-form input:focus { outline: none; border-color: var(--ink); }
 

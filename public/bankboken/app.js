@@ -273,6 +273,23 @@ function initIconPicker() {
 
 function payerKey() { return getPayer() === PEOPLE.A.name ? "A" : "B"; }
 
+function todayInputValue() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function expenseTimestamp(dateValue) {
+  const [year, month, day] = dateValue.split("-").map(Number);
+  const now = new Date();
+  return new Date(
+    year, month - 1, day,
+    now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds(),
+  ).getTime();
+}
+
 function updatePreview() {
   const amount = parseFloat(document.getElementById("e-amount").value) || 0;
   const split = getSplit(); // 'a' | 'even' | 'b'
@@ -294,6 +311,9 @@ function initApp() {
   getSplit = initSegments("e-split", updatePreview);
   initIconPicker();
 
+  const dateInput = document.getElementById("e-date");
+  dateInput.value = todayInputValue();
+
   document.getElementById("e-amount").addEventListener("input", updatePreview);
 
   // Config-driven labels
@@ -308,12 +328,14 @@ function initApp() {
     ev.preventDefault();
     const desc = document.getElementById("e-desc").value.trim();
     const amount = parseFloat(document.getElementById("e-amount").value);
-    if (!desc || !(amount > 0)) return;
+    const date = dateInput.value;
+    if (!desc || !(amount > 0) || !date) return;
     await store.add({
       type: "expense", desc, amount, icon: getIcon(),
-      payer: payerKey(), split: getSplit(), ts: Date.now(),
+      payer: payerKey(), split: getSplit(), ts: expenseTimestamp(date),
     });
     ev.target.reset();
+    dateInput.value = todayInputValue();
     setActive("e-payer", PEOPLE.A.name);
     setActive("e-split", "even");
     setIcon(ICON_DEFAULT);
