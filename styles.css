@@ -117,6 +117,12 @@ button { font-family: inherit; cursor: pointer; }
   background: linear-gradient(135deg, #a9cd3a 0%, #489b2e 100%); color: #fff; font-weight: 600; font-size: 0.98rem;
 }
 .btn-swish-open:active { transform: scale(0.99); }
+.btn-confirm-settle {
+  width: 100%; padding: 14px; border-radius: var(--r-pill);
+  border: 1px solid var(--line); background: var(--card); color: var(--ink);
+  font-size: 0.95rem; font-weight: 600;
+}
+.btn-confirm-settle:active { transform: scale(0.99); }
 
 /* ============ FORM ============ */
 .field { display: block; margin-bottom: 16px; }

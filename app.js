@@ -63,7 +63,7 @@ function balanceOf(entries) {
   let bal = 0;
   for (const e of entries) {
     if (e.type === "settlement") {
-      bal -= (e.payer === "A" ? 1 : -1) * e.amount;
+      bal += (e.payer === "A" ? 1 : -1) * e.amount;
     } else {
       const s = sharesOf(e);
       bal += e.payer === "A" ? s.b : -s.a; // other person's share the payer covered
@@ -196,8 +196,19 @@ function onSettleClick() {
   document.getElementById("swish-open").href = link;
   document.getElementById("settle-panel").hidden = false;
 
-  // Open the Swish app on this device instantly
-  window.location.href = link;
+  // Open Swish separately so Bankboken stays available for confirmation.
+  window.open(link, "_blank", "noopener,noreferrer");
+}
+
+async function confirmSettlement() {
+  const bal = balanceOf(ENTRIES);
+  if (Math.abs(bal) < 0.01) return;
+  const payer = bal > 0 ? "B" : "A";
+  await store.add({
+    type: "settlement", payer, amount: Math.abs(bal), ts: Date.now(),
+  });
+  document.getElementById("settle-panel").hidden = true;
+  document.getElementById("saldo-card").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 // ============================================================
@@ -312,6 +323,7 @@ function initApp() {
   });
 
   document.getElementById("settle-btn").addEventListener("click", onSettleClick);
+  document.getElementById("confirm-settle").addEventListener("click", confirmSettlement);
 }
 
 // ============================================================
@@ -334,9 +346,12 @@ document.getElementById("lock-form").addEventListener("submit", async (ev) => {
   ev.preventDefault();
   const err = document.getElementById("lock-error");
   if ((await sha256(document.getElementById("pw").value)) === PASSWORD_SHA256) {
+    localStorage.setItem("hepa-unlocked", "1");
     unlock();
   } else {
     err.hidden = false;
     document.getElementById("pw").value = "";
   }
 });
+
+if (localStorage.getItem("hepa-unlocked") === "1") unlock();
