@@ -27,6 +27,9 @@
 
 html, body {
   margin: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
   background: var(--bg);
   color: var(--ink);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -72,7 +75,7 @@ button { font-family: inherit; cursor: pointer; }
 .identity-options button { border-radius: var(--r-field); }
 
 /* ============ SHELL ============ */
-#app { max-width: 520px; margin: 0 auto; padding: 10px 16px 40px; }
+#app { width: 100%; max-width: 520px; min-width: 0; margin: 0 auto; padding: 10px 16px 40px; }
 .app-head {
   display: flex; align-items: center; justify-content: space-between;
   padding: 10px 6px 14px;
@@ -85,9 +88,10 @@ button { font-family: inherit; cursor: pointer; }
 }
 .sync { color: var(--ink-3); font-size: 0.6rem; }
 
-.stack { display: grid; gap: 20px; }
+.stack { display: grid; min-width: 0; gap: 20px; }
 
 .card {
+  width: 100%; min-width: 0;
   background: var(--card);
   border-radius: var(--r-card);
   padding: 26px 24px;
@@ -162,7 +166,7 @@ button { font-family: inherit; cursor: pointer; }
   background: var(--seg-track); border-radius: var(--r-field);
 }
 .seg button {
-  flex: 1; padding: 11px 6px; border-radius: 10px; border: none;
+  flex: 1; min-width: 0; padding: 11px 6px; border-radius: 10px; border: none;
   background: transparent; color: var(--ink-2);
   font-size: 0.92rem; font-weight: 500; white-space: nowrap;
   transition: background 0.12s ease, color 0.12s ease;
