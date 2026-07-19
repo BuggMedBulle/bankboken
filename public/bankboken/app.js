@@ -84,6 +84,14 @@ let ENTRIES = [];
 let CURRENT_USER = localStorage.getItem("bankboken-person");
 let APP_INITIALIZED = false;
 
+function subjectName(personKey) {
+  return personKey === CURRENT_USER ? "Du" : PEOPLE[personKey].name;
+}
+
+function objectName(personKey) {
+  return personKey === CURRENT_USER ? "dig" : PEOPLE[personKey].name;
+}
+
 function render() { renderBalance(); renderHistory(); }
 
 function renderBalance() {
@@ -109,7 +117,7 @@ function renderBalance() {
   const owed = Math.abs(bal);
 
   heading.textContent = kr(owed);
-  sub.innerHTML = `<strong>${escapeHtml(debtor.name)}</strong> är skyldig ${escapeHtml(creditor.name)}`;
+  sub.innerHTML = `<strong>${escapeHtml(subjectName(debtorKey))}</strong> är skyldig ${escapeHtml(objectName(creditorKey))}`;
   if (CURRENT_USER !== debtorKey) return;
 
   btn.hidden = false;
@@ -133,18 +141,19 @@ function renderHistory() {
       ENTRIES.filter((e) => e.type !== "settlement" && e.payer === who).reduce((s, e) => s + e.amount, 0);
     const a = sum("A"), b = sum("B");
     totals.innerHTML = `
-      <span>${PEOPLE.A.name}<b>${kr0(a)}</b></span>
-      <span>${PEOPLE.B.name}<b>${kr0(b)}</b></span>
+      <span>${subjectName("A")}<b>${kr0(a)}</b></span>
+      <span>${subjectName("B")}<b>${kr0(b)}</b></span>
       <span>Totalt<b>${kr0(a + b)}</b></span>`;
   }
 
   for (const e of ENTRIES) {
     const li = document.createElement("li");
-    const who = PEOPLE[e.payer]?.name ?? e.payer;
+    const who = PEOPLE[e.payer] ? subjectName(e.payer) : e.payer;
     const date = new Date(e.ts).toLocaleDateString("sv-SE", { day: "numeric", month: "short" });
 
     if (e.type === "settlement") {
-      const to = e.payer === "A" ? PEOPLE.B.name : PEOPLE.A.name;
+      const recipientKey = e.payer === "A" ? "B" : "A";
+      const to = objectName(recipientKey);
       li.className = "h-settle";
       li.innerHTML = `
         <div class="h-ico">💸</div>
@@ -155,8 +164,8 @@ function renderHistory() {
         <div class="h-amt">${kr(e.amount)}</div>`;
     } else {
       const split =
-        e.split === "a" ? `100% ${PEOPLE.A.name}` :
-        e.split === "b" ? `100% ${PEOPLE.B.name}` : "50/50";
+        e.split === "a" ? `100% ${subjectName("A")}` :
+        e.split === "b" ? `100% ${subjectName("B")}` : "50/50";
       li.innerHTML = `
         <div class="h-ico">${e.icon || "🧾"}</div>
         <div class="h-main">
@@ -271,6 +280,13 @@ function initIconPicker() {
 function payerKey() { return getPayer() === PEOPLE.A.name ? "A" : "B"; }
 function currentPersonName() { return PEOPLE[CURRENT_USER]?.name || PEOPLE.A.name; }
 
+function updatePersonLabels() {
+  document.querySelector('#e-payer [data-val="Helo"]').textContent = subjectName("A");
+  document.querySelector('#e-payer [data-val="Halvis"]').textContent = subjectName("B");
+  document.querySelector('#e-split [data-val="a"]').textContent = `100% ${subjectName("A")}`;
+  document.querySelector('#e-split [data-val="b"]').textContent = `100% ${subjectName("B")}`;
+}
+
 function todayInputValue() {
   const now = new Date();
   const year = now.getFullYear();
@@ -291,8 +307,8 @@ function expenseTimestamp(dateValue) {
 function updatePreview() {
   const amount = parseFloat(document.getElementById("e-amount").value) || 0;
   const split = getSplit(); // 'a' | 'even' | 'b'
-  const payer = payerKey() === "A" ? PEOPLE.A : PEOPLE.B;
-  const other = payerKey() === "A" ? PEOPLE.B : PEOPLE.A;
+  const payer = payerKey();
+  const other = payer === "A" ? "B" : "A";
   const el = document.getElementById("split-preview");
 
   if (amount <= 0) { el.hidden = true; return; }
@@ -300,8 +316,8 @@ function updatePreview() {
   const owes = payerKey() === "A" ? shares.b : shares.a; // what the non-payer owes
   el.hidden = false;
   el.textContent = owes <= 0
-    ? `Ingen skuld – ${payer.name} står för hela beloppet.`
-    : `${other.name} blir skyldig ${payer.name} ${kr(owes)}.`;
+    ? `Ingen skuld – ${subjectName(payer)} står för hela beloppet.`
+    : `${subjectName(other)} blir skyldig ${objectName(payer)} ${kr(owes)}.`;
 }
 
 function initApp() {
@@ -317,11 +333,10 @@ function initApp() {
   // Config-driven labels
   const pA = document.querySelector('#e-payer [data-val="Helo"]');
   const pB = document.querySelector('#e-payer [data-val="Halvis"]');
-  pA.textContent = PEOPLE.A.name; pA.dataset.val = PEOPLE.A.name;
-  pB.textContent = PEOPLE.B.name; pB.dataset.val = PEOPLE.B.name;
+  pA.dataset.val = PEOPLE.A.name;
+  pB.dataset.val = PEOPLE.B.name;
+  updatePersonLabels();
   setActive("e-payer", currentPersonName());
-  document.querySelector('#e-split [data-val="a"]').textContent = `100% ${PEOPLE.A.name}`;
-  document.querySelector('#e-split [data-val="b"]').textContent = `100% ${PEOPLE.B.name}`;
 
   document.getElementById("expense-form").addEventListener("submit", async (ev) => {
     ev.preventDefault();
@@ -369,7 +384,9 @@ async function enterApp() {
   document.getElementById("app").hidden = false;
   document.getElementById("identity-change").textContent = PEOPLE[CURRENT_USER].name;
   if (APP_INITIALIZED) {
+    updatePersonLabels();
     setActive("e-payer", currentPersonName());
+    updatePreview();
     render();
     return;
   }
