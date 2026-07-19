@@ -179,8 +179,7 @@ function escapeHtml(s) {
 //  SWISH
 // ============================================================
 const buildSwishLink = (payee, amount, msg) =>
-  `https://app.swish.nu/1/p/sw/?${new URLSearchParams({ sw: payee, amt: amount, cur: "SEK", msg, src: "qr" })}`;
-const buildSwishQrPayload = (payee, amount, msg) => `C${payee};${amount};${msg};0`;
+  `https://app.swish.nu/1/p/sw/?${new URLSearchParams({ sw: payee, amt: amount, cur: "SEK", msg })}`;
 
 function onSettleClick() {
   const btn = document.getElementById("settle-btn");
@@ -188,15 +187,7 @@ function onSettleClick() {
   const { payee, amount, msg } = btn.dataset;
   const link = buildSwishLink(payee, amount, msg);
 
-  // QR + fallback link (for the other person to scan, and if the app doesn't open)
-  const qr = qrcode(0, "M");
-  qr.addData(buildSwishQrPayload(payee, amount, msg));
-  qr.make();
-  document.getElementById("qr").innerHTML = qr.createSvgTag({ cellSize: 6, margin: 2, scalable: true });
-  document.getElementById("swish-open").href = link;
   document.getElementById("settle-panel").hidden = false;
-
-  // Open Swish separately so Bankboken stays available for confirmation.
   window.open(link, "_blank", "noopener,noreferrer");
 }
 

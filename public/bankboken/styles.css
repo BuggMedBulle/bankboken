@@ -108,15 +108,6 @@ button { font-family: inherit; cursor: pointer; }
 .btn-swish:disabled { background: #e2dfd8; cursor: default; }
 
 .settle-panel { margin-top: 18px; display: grid; place-items: center; gap: 12px; }
-.qr { background: #fff; padding: 14px; border-radius: 16px; border: 1px solid var(--line); }
-.qr svg { width: 200px; height: 200px; display: block; }
-.hint { margin: 0; color: var(--ink-2); font-size: 0.85rem; text-align: center; }
-.btn-swish-open {
-  width: 100%; text-align: center; text-decoration: none;
-  padding: 15px; border-radius: var(--r-pill);
-  background: linear-gradient(135deg, #a9cd3a 0%, #489b2e 100%); color: #fff; font-weight: 600; font-size: 0.98rem;
-}
-.btn-swish-open:active { transform: scale(0.99); }
 .btn-confirm-settle {
   width: 100%; padding: 14px; border-radius: var(--r-pill);
   border: 1px solid var(--line); background: var(--card); color: var(--ink);

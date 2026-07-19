@@ -4,8 +4,8 @@
 
 // --- 1. The two people -------------------------------------------------
 export const PEOPLE = {
-  A: { name: "Helo",   swish: "0739709200" },  // <- Helo's Swish number
-  B: { name: "Halvis", swish: "0736137972" },  // <- Halvis's Swish number
+  A: { name: "Helo",   swish: "46739709200" },
+  B: { name: "Halvis", swish: "46736137972" },
 };
 
 // --- 2. Password lock --------------------------------------------------
