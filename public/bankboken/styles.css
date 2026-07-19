@@ -134,12 +134,17 @@ button { font-family: inherit; cursor: pointer; }
   color: var(--ink);
 }
 #expense-form input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
   display: block;
+  inline-size: 100%;
   min-width: 0;
   max-width: 100%;
   min-height: 54px;
+  overflow: hidden;
   font-family: inherit;
 }
+.date-field { min-width: 0; overflow: hidden; }
 #expense-form input::placeholder { color: var(--ink-3); }
 #expense-form input:focus { outline: none; border-color: var(--ink); }
 
