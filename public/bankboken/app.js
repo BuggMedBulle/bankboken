@@ -127,8 +127,10 @@ function renderHistory() {
     const sum = (who) =>
       ENTRIES.filter((e) => e.type !== "settlement" && e.payer === who).reduce((s, e) => s + e.amount, 0);
     const a = sum("A"), b = sum("B");
-    totals.innerHTML =
-      `${PEOPLE.A.name} <b>${kr0(a)}</b> · ${PEOPLE.B.name} <b>${kr0(b)}</b> · Totalt <b>${kr0(a + b)}</b>`;
+    totals.innerHTML = `
+      <span>${PEOPLE.A.name}<b>${kr0(a)}</b></span>
+      <span>${PEOPLE.B.name}<b>${kr0(b)}</b></span>
+      <span>Totalt<b>${kr0(a + b)}</b></span>`;
   }
 
   for (const e of ENTRIES) {
