@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#efede9" />
+  <title>Split Happens</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Boldonse&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=split-happens-1" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📒</text></svg>" />
+</head>
+<body>
+  <div id="auth-screen" class="lock">
+    <div class="lock-card auth-card">
+      <h1>Split Happens</h1>
+      <p class="auth-intro">Logga in för att komma åt er delning.</p>
+      <form id="auth-form" autocomplete="on">
+        <input id="auth-name" type="text" placeholder="Ditt namn" autocomplete="name" hidden />
+        <input id="auth-swish" type="tel" placeholder="Swishnummer" autocomplete="tel" hidden />
+        <input id="auth-email" type="email" placeholder="E-post" autocomplete="email" required />
+        <input id="auth-password" type="password" placeholder="Lösenord, minst 6 tecken" autocomplete="current-password" required minlength="6" />
+        <button id="auth-submit" type="submit">Logga in</button>
+      </form>
+      <button id="auth-mode" class="text-button" type="button">Skapa ett konto</button>
+      <p id="auth-error" class="error" hidden></p>
+    </div>
+  </div>
+
+  <div id="bankbook-screen" class="lock" hidden>
+    <div class="lock-card bankbook-card">
+      <h1>Split Happens</h1>
+      <p id="welcome-name" class="auth-intro"></p>
+      <div id="invite-panel" class="invite-panel" hidden>
+        <h2>Bjud in den andra personen</h2>
+        <p>Skicka länken. Personen skapar ett eget konto och ansluts direkt till er delning.</p>
+        <input id="invite-link" type="text" readonly aria-label="Inbjudningslänk" />
+        <div class="invite-actions">
+          <button id="copy-invite" type="button">Kopiera länk</button>
+          <button id="share-invite" type="button" class="secondary-button">Dela</button>
+        </div>
+      </div>
+      <form id="join-bankbook-form" class="bankbook-form">
+        <h2>Har du fått en inbjudan?</h2>
+        <input id="invite-code" type="text" placeholder="Klistra in länk eller kod" autocapitalize="off" required />
+        <button type="submit" class="secondary-button">Anslut</button>
+      </form>
+      <p id="bankbook-error" class="error" hidden></p>
+      <button id="logout-menu" class="text-button" type="button">Logga ut</button>
+    </div>
+  </div>
+
+  <!-- ============ APP ============ -->
+  <div id="app" hidden>
+    <header class="app-head">
+      <span class="brand">Split Happens</span>
+      <div class="app-meta">
+        <button id="identity-change" type="button"><span id="identity-name"></span><img src="switch.svg" alt="" /></button>
+        <span id="sync-dot" class="sync" title="Ansluter…" hidden></span>
+      </div>
+    </header>
+
+    <main class="stack">
+      <!-- Saldo -->
+      <section class="card" id="saldo-card">
+        <p class="eyebrow">Saldo</p>
+        <h1 id="balance-heading">Läser in…</h1>
+        <p class="sub" id="balance-sub"></p>
+
+        <button id="settle-btn" class="btn-swish" aria-label="Reglera med Swish" hidden>
+          <img class="swish-logo-img" src="swish-logo.svg" alt="Swish" />
+        </button>
+
+        <div id="settle-panel" class="settle-panel" hidden>
+          <button id="confirm-settle" class="btn-confirm-settle" type="button">Markera som swishat</button>
+        </div>
+      </section>
+
+      <!-- Ny utgift -->
+      <section class="card">
+        <h2 id="expense-heading">Ny utgift</h2>
+        <div id="expense-form-home">
+        <form id="expense-form">
+          <div class="field">
+            <span class="field-label">Beskrivning</span>
+            <div class="desc-row">
+              <button type="button" id="icon-trigger" class="icon-trigger"
+                      aria-haspopup="true" aria-expanded="false" title="Välj kategori">🧾</button>
+              <input id="e-desc" type="text" placeholder="t.ex. Matvaror ICA" required maxlength="60" />
+              <div id="icon-pop" class="icon-pop" hidden>
+                <button type="button" data-icon="🧾" title="Övrigt">🧾</button>
+                <button type="button" data-icon="🛒" title="Mat">🛒</button>
+                <button type="button" data-icon="🍽️" title="Lunch eller middag">🍽️</button>
+                <button type="button" data-icon="🎬" title="Bio">🎬</button>
+                <button type="button" data-icon="🍿" title="Snacks eller godis">🍿</button>
+                <button type="button" data-icon="🍷" title="Alkohol">🍷</button>
+                <button type="button" data-icon="✈️" title="Resa">✈️</button>
+                <button type="button" data-icon="🚕" title="Taxi">🚕</button>
+                <button type="button" data-icon="🏟️" title="Live-sport">🏟️</button>
+                <button type="button" data-icon="⛽" title="Bensin">⛽</button>
+                <button type="button" data-icon="🛍️" title="Shopping">🛍️</button>
+                <button type="button" data-icon="🗺️" title="Upplevelser eller utflykter">🗺️</button>
+              </div>
+            </div>
+          </div>
+
+          <label class="field">
+            <span class="field-label">Belopp</span>
+            <div class="input-wrap">
+              <input id="e-amount" type="number" inputmode="decimal" step="0.01" min="0.01" placeholder="0" required />
+              <span class="suffix">kr</span>
+            </div>
+          </label>
+
+          <label class="field date-field">
+            <span class="field-label">Datum</span>
+            <input id="e-date" type="date" required />
+          </label>
+
+          <div class="field">
+            <span class="field-label">Betalat av</span>
+            <div class="seg" id="e-payer">
+              <button type="button" data-val="A" class="active">Person 1</button>
+              <button type="button" data-val="B">Person 2</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="field-label">Delning</span>
+            <div class="split-picker" id="e-split">
+              <div class="seg split-presets">
+                <button type="button" data-val="a">100% Helo</button>
+                <button type="button" data-val="even" class="active">50 / 50</button>
+                <button type="button" data-val="b">100% Halvis</button>
+              </div>
+              <button type="button" class="custom-split-button" data-val="custom">Anpassad</button>
+            </div>
+            <div id="custom-split" class="custom-split" hidden>
+              <div class="custom-split-labels">
+                <span class="custom-split-label">
+                  <strong id="custom-a-name">Helo</strong>
+                  <span id="custom-a-value">50% · 0,00 kr</span>
+                </span>
+                <span class="custom-split-label custom-split-label-right">
+                  <strong id="custom-b-name">Halvis</strong>
+                  <span id="custom-b-value">50% · 0,00 kr</span>
+                </span>
+              </div>
+              <input id="e-custom-share" type="range" min="0" max="100" step="1" value="50" aria-label="Halvis andel" />
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary"><span class="btn-icon" id="submit-icon" aria-hidden="true">+</span><span id="submit-label">Lägg till utgift</span></button>
+            <button type="button" class="edit-action edit-cancel" id="edit-cancel" aria-label="Avbryt redigering" title="Avbryt redigering" hidden><img src="modal-close.svg" alt="" /></button>
+            <button type="button" class="edit-action edit-delete" id="edit-delete" aria-label="Ta bort utlägg" title="Ta bort utlägg" hidden><img src="trash.svg" alt="" /></button>
+          </div>
+
+          <p class="preview" id="split-preview" hidden></p>
+        </form>
+        </div>
+      </section>
+
+      <!-- Historik -->
+      <section class="card">
+        <h2>Historik</h2>
+        <p class="totals" id="totals" hidden></p>
+        <ul id="history-list" class="history"></ul>
+        <nav id="history-pagination" class="history-pagination" aria-label="Historiksidor" hidden>
+          <button type="button" id="history-prev" aria-label="Föregående sida">←</button>
+          <span id="history-page-status"></span>
+          <button type="button" id="history-next" aria-label="Nästa sida">→</button>
+        </nav>
+        <p id="history-empty" class="empty">Inga utgifter än. Lägg till er första ovan.</p>
+      </section>
+    </main>
+  </div>
+
+  <div id="edit-modal" class="edit-modal" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title" hidden>
+    <div class="edit-modal-card">
+      <h2 id="edit-modal-title">Redigera utgift</h2>
+      <div id="edit-form-modal"></div>
+    </div>
+  </div>
+
+  <script type="module" src="app.js?v=split-happens-1"></script>
+</body>
+</html>
