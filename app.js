@@ -91,7 +91,7 @@ let CURRENT_USER = localStorage.getItem("bankboken-person");
 let APP_INITIALIZED = false;
 let HISTORY_FILTER = null;
 let HISTORY_PAGE = 1;
-const HISTORY_PAGE_SIZE = 20;
+const HISTORY_PAGE_SIZE = 10;
 
 function subjectName(personKey) {
   return personKey === CURRENT_USER ? "Du" : PEOPLE[personKey].name;
