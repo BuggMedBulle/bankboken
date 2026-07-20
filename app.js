@@ -416,7 +416,7 @@ function onEntryTypeChange(type) {
   const isIncome = type === "income";
   document.getElementById("expense-heading").textContent = EDITING_ID
     ? (isIncome ? "Redigera inkomst" : "Redigera utgift")
-    : (isIncome ? "Ny inkomst" : "Ny utgift");
+    : "Lägg till";
   document.getElementById("payer-label").textContent = isIncome ? "Mottaget av" : "Betalat av";
   document.getElementById("submit-label").textContent = EDITING_ID
     ? "Spara ändringar"
@@ -466,7 +466,7 @@ function resetExpenseForm() {
   setActive("e-split", "even");
   document.getElementById("e-custom-share").value = "50";
   document.getElementById("custom-split").hidden = true;
-  document.getElementById("expense-heading").textContent = "Ny utgift";
+  document.getElementById("expense-heading").textContent = "Lägg till";
   document.getElementById("submit-icon").textContent = "+";
   document.getElementById("submit-label").textContent = "Lägg till utgift";
   document.getElementById("edit-cancel").hidden = true;
