@@ -353,7 +353,7 @@ function updatePersonLabels() {
   const payer = document.getElementById("e-payer");
   const leftPayerButton = payer.querySelector(`[data-val="${leftKey}"]`);
   const rightPayerButton = payer.querySelector(`[data-val="${rightKey}"]`);
-  leftPayerButton.textContent = subjectName(leftKey);
+  leftPayerButton.textContent = "Dig";
   rightPayerButton.textContent = subjectName(rightKey);
   payer.append(leftPayerButton, rightPayerButton);
 
