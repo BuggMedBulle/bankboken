@@ -657,7 +657,6 @@ async function openBankbook(bankbook) {
   PEOPLE = people.people;
   CURRENT_USER = people.currentSlot;
   localStorage.setItem(`bankboken-active-${signedInUser.uid}`, bankbook.id);
-  document.getElementById("identity-name").textContent = PEOPLE[CURRENT_USER].name;
   document.querySelector(".brand").title = bankbook.name;
   ENTRIES = [];
   HISTORY_FILTER = null;

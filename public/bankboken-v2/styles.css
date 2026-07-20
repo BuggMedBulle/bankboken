@@ -104,7 +104,6 @@ button { font-family: inherit; cursor: pointer; }
   border: 0; border-radius: var(--r-pill); padding: 6px 10px;
   background: var(--field); color: var(--ink-2); font-size: 0.72rem; font-weight: 600;
 }
-#identity-change img { width: 14px; height: 14px; opacity: 0.55; }
 .sync { color: var(--ink-3); font-size: 0.6rem; }
 
 .stack { display: grid; min-width: 0; gap: 20px; }
