@@ -16,6 +16,102 @@ let unsubscribeWaitingRoom;
 let unsubscribeActiveBankbook;
 let openingBankbook = false;
 
+const TRANSLATIONS = {
+  sv: {
+    authIntro: "Logga in för att komma åt er delning.", yourName: "Ditt namn", swishNumber: "Swishnummer",
+    email: "E-post", password: "Lösenord, minst 6 tecken", login: "Logga in", createAccount: "Skapa ett konto",
+    forgotPassword: "Glömt lösenord?", inviteOther: "Bjud in den andra personen",
+    inviteHelp: "Skicka länken. Den här sidan öppnar appen automatiskt så fort personen har anslutit.",
+    copyLink: "Kopiera länk", copied: "Kopierad!", share: "Dela", gotInvite: "Har du fått en inbjudan?",
+    pasteInvite: "Klistra in länk eller kod", join: "Anslut", logout: "Logga ut", settings: "Inställningar",
+    closeSettings: "Stäng inställningar", balance: "Saldo", markPaid: "Markera som swishat", add: "Lägg till",
+    expense: "Utgift", income: "Inkomst", description: "Beskrivning", descriptionExample: "t.ex. Matvaror ICA",
+    amount: "Belopp", date: "Datum", split: "Delning", custom: "Anpassad", history: "Historik",
+    language: "Språk", saveChanges: "Spara ändringar", you: "Du", youObject: "dig", receivedBy: "Mottaget av",
+    paidBy: "Betalat av", addIncome: "Lägg till inkomst", addExpense: "Lägg till utgift",
+    editIncome: "Redigera inkomst", editExpense: "Redigera utgift", save: "Spara ändringar",
+    allEven: "Allt är jämnt. Ingen är skyldig något.", owes: "är skyldig", total: "Totalt",
+    noEntries: "Inga utgifter än. Lägg till er första ovan.", noEntriesFor: "Inga utgifter för {name}.",
+    page: "Sida {page} av {count}", settlement: "Reglering", paid: "betalade", received: "tog emot",
+    treated: "bjöd 💕", delete: "Ta bort", deleteEntry: "Ta bort denna post?",
+    entitledAll: "{name} har rätt till hela inkomsten.", entitled: "{name} har rätt till {amount}.",
+    noDebtFull: "Ingen skuld – {name} står för hela beloppet.", becomesOwed: "{name} blir skyldig {recipient} {amount}.",
+    welcomeWaiting: "Hej {name}! Väntar på den andra personen…", createAccountShort: "Skapa konto",
+    alreadyAccount: "Jag har redan ett konto", sending: "Skickar…",
+    resetSent: "Ett återställningsmail har skickats. Kontrollera även skräpposten.",
+    enterEmail: "Fyll i din e-postadress först.", shareInvite: "Anslut till vår delning",
+    completeAccount: "Slutför konto", switchAccount: "Logga ut och byt konto", synced: "Synkad (Firebase)",
+    syncFailed: "Synkningen misslyckades", syncing: "Ansluter…", incomeIcon: "Inkomst", otherIcon: "Övrigt",
+    inviteLink: "Inbjudningslänk", settleSwish: "Reglera med Swish", chooseCategory: "Välj kategori",
+    currencySuffix: "kr", cancelEditing: "Avbryt redigering", deleteExpense: "Ta bort utlägg",
+    historyPages: "Historiksidor", previousPage: "Föregående sida", nextPage: "Nästa sida",
+    groceries: "Mat", meal: "Lunch eller middag", cinema: "Bio", snacks: "Snacks eller godis",
+    alcohol: "Alkohol", travel: "Resa", taxi: "Taxi", liveSport: "Live-sport", fuel: "Bensin",
+    shopping: "Shopping", experiences: "Upplevelser eller utflykter",
+  },
+  en: {
+    authIntro: "Log in to access your shared expenses.", yourName: "Your name", swishNumber: "Swish number",
+    email: "Email", password: "Password, at least 6 characters", login: "Log in", createAccount: "Create an account",
+    forgotPassword: "Forgot password?", inviteOther: "Invite the other person",
+    inviteHelp: "Send the link. This page opens the app automatically as soon as the other person joins.",
+    copyLink: "Copy link", copied: "Copied!", share: "Share", gotInvite: "Have you received an invitation?",
+    pasteInvite: "Paste link or code", join: "Join", logout: "Log out", settings: "Settings",
+    closeSettings: "Close settings", balance: "Balance", markPaid: "Mark as paid", add: "Add",
+    expense: "Expense", income: "Income", description: "Description", descriptionExample: "e.g. Groceries",
+    amount: "Amount", date: "Date", split: "Split", custom: "Custom", history: "History",
+    language: "Language", saveChanges: "Save changes", you: "You", youObject: "you", receivedBy: "Received by",
+    paidBy: "Paid by", addIncome: "Add income", addExpense: "Add expense",
+    editIncome: "Edit income", editExpense: "Edit expense", save: "Save changes",
+    allEven: "Everything is settled. No one owes anything.", owes: "owes", total: "Total",
+    noEntries: "No expenses yet. Add your first one above.", noEntriesFor: "No expenses for {name}.",
+    page: "Page {page} of {count}", settlement: "Settlement", paid: "paid", received: "received",
+    treated: "treated 💕", delete: "Delete", deleteEntry: "Delete this entry?",
+    entitledAll: "{name} is entitled to all of the income.", entitled: "{name} is entitled to {amount}.",
+    noDebtFull: "No debt – {name} covers the full amount.", becomesOwed: "{name} owes {recipient} {amount}.",
+    welcomeWaiting: "Hi {name}! Waiting for the other person…", createAccountShort: "Create account",
+    alreadyAccount: "I already have an account", sending: "Sending…",
+    resetSent: "A password reset email has been sent. Please also check your spam folder.",
+    enterEmail: "Enter your email address first.", shareInvite: "Join our shared expenses",
+    completeAccount: "Complete account", switchAccount: "Log out and switch account", synced: "Synced (Firebase)",
+    syncFailed: "Sync failed", syncing: "Connecting…", incomeIcon: "Income", otherIcon: "Other",
+    inviteLink: "Invitation link", settleSwish: "Settle with Swish", chooseCategory: "Choose category",
+    currencySuffix: "SEK", cancelEditing: "Cancel editing", deleteExpense: "Delete expense",
+    historyPages: "History pages", previousPage: "Previous page", nextPage: "Next page",
+    groceries: "Groceries", meal: "Lunch or dinner", cinema: "Cinema", snacks: "Snacks or candy",
+    alcohol: "Alcohol", travel: "Travel", taxi: "Taxi", liveSport: "Live sports", fuel: "Fuel",
+    shopping: "Shopping", experiences: "Experiences or excursions",
+  },
+};
+const requestedLanguage = new URL(window.location.href).searchParams.get("lang");
+let LANGUAGE = requestedLanguage === "en" || requestedLanguage === "sv"
+  ? requestedLanguage
+  : (localStorage.getItem("split-happens-language") === "en" ? "en" : "sv");
+if (requestedLanguage === "en" || requestedLanguage === "sv") {
+  localStorage.setItem("split-happens-language", LANGUAGE);
+}
+
+function t(key, values = {}) {
+  let text = TRANSLATIONS[LANGUAGE][key] || TRANSLATIONS.sv[key] || key;
+  for (const [name, value] of Object.entries(values)) text = text.replace(`{${name}}`, value);
+  return text;
+}
+
+function applyLanguage() {
+  document.documentElement.lang = LANGUAGE;
+  document.querySelectorAll("[data-i18n]").forEach((element) => { element.textContent = t(element.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => { element.placeholder = t(element.dataset.i18nPlaceholder); });
+  document.querySelectorAll("[data-i18n-title]").forEach((element) => { element.title = t(element.dataset.i18nTitle); });
+  document.querySelectorAll("[data-i18n-aria]").forEach((element) => { element.setAttribute("aria-label", t(element.dataset.i18nAria)); });
+  document.querySelectorAll("#settings-language button").forEach((button) =>
+    button.classList.toggle("active", button.dataset.language === LANGUAGE));
+  updateAuthLabels();
+  if (APP_INITIALIZED) {
+    updatePersonLabels();
+    onEntryTypeChange(getEntryType());
+    render();
+  }
+}
+
 // ============================================================
 //  STORAGE LAYER
 //  Firebase (real-time sync) when config.js is filled in,
@@ -29,13 +125,13 @@ async function initStore() {
     subscribe(cb) {
       const q = fs.query(col, fs.orderBy("ts", "desc"));
       return fs.onSnapshot(q, (snap) => cb(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
-        (err) => { console.error(err); setSync(false, "Synkningen misslyckades"); });
+        (err) => { console.error(err); setSync(false, t("syncFailed")); });
     },
     async add(entry) { await fs.addDoc(col, { ...entry, updatedBy: signedInUser.uid }); },
     async update(id, entry) { await fs.updateDoc(fs.doc(col, id), { ...entry, updatedBy: signedInUser.uid }); },
     async remove(id) { await fs.deleteDoc(fs.doc(col, id)); },
   };
-  setSync(true, "Synkad (Firebase)");
+  setSync(true, t("synced"));
 }
 
 function setSync(ok, title) {
@@ -77,10 +173,11 @@ function balanceOf(entries) {
   return Math.round(bal * 100) / 100;
 }
 
+const locale = () => LANGUAGE === "en" ? "en-SE" : "sv-SE";
 const kr = (n) =>
-  new Intl.NumberFormat("sv-SE", { style: "currency", currency: "SEK", maximumFractionDigits: 2 }).format(n);
+  new Intl.NumberFormat(locale(), { style: "currency", currency: "SEK", maximumFractionDigits: 2 }).format(n);
 const kr0 = (n) =>
-  new Intl.NumberFormat("sv-SE", { style: "currency", currency: "SEK", maximumFractionDigits: 0 }).format(n);
+  new Intl.NumberFormat(locale(), { style: "currency", currency: "SEK", maximumFractionDigits: 0 }).format(n);
 
 // ============================================================
 //  RENDER
@@ -93,11 +190,11 @@ let HISTORY_PAGE = 1;
 const HISTORY_PAGE_SIZE = 10;
 
 function subjectName(personKey) {
-  return personKey === CURRENT_USER ? "Du" : PEOPLE[personKey].name;
+  return personKey === CURRENT_USER ? t("you") : PEOPLE[personKey].name;
 }
 
 function objectName(personKey) {
-  return personKey === CURRENT_USER ? "dig" : PEOPLE[personKey].name;
+  return personKey === CURRENT_USER ? t("youObject") : PEOPLE[personKey].name;
 }
 
 function otherPersonKey(personKey = CURRENT_USER) {
@@ -130,7 +227,7 @@ function renderBalance() {
 
   if (Math.abs(bal) < 0.01) {
     heading.textContent = kr(0);
-    sub.textContent = "Allt är jämnt. Ingen är skyldig något.";
+    sub.textContent = t("allEven");
     return;
   }
 
@@ -140,7 +237,7 @@ function renderBalance() {
   const owed = Math.abs(bal);
 
   heading.textContent = kr(owed);
-  sub.innerHTML = `<strong>${escapeHtml(subjectName(debtorKey))}</strong> är skyldig ${escapeHtml(objectName(creditorKey))}`;
+  sub.innerHTML = `<strong>${escapeHtml(subjectName(debtorKey))}</strong> ${t("owes")} ${escapeHtml(objectName(creditorKey))}`;
   if (CURRENT_USER !== debtorKey) return;
 
   btn.hidden = false;
@@ -168,7 +265,7 @@ function renderHistory() {
     totals.innerHTML = `
       <button type="button" data-filter="${leftKey}" class="${HISTORY_FILTER === leftKey ? "active" : ""}" aria-pressed="${HISTORY_FILTER === leftKey}">${subjectName(leftKey)}<b>${kr0(amounts[leftKey])}</b></button>
       <button type="button" data-filter="${rightKey}" class="${HISTORY_FILTER === rightKey ? "active" : ""}" aria-pressed="${HISTORY_FILTER === rightKey}">${subjectName(rightKey)}<b>${kr0(amounts[rightKey])}</b></button>
-      <button type="button" data-filter="all" aria-label="Visa alla utgifter">Totalt<b>${kr0(amounts.A + amounts.B)}</b></button>`;
+      <button type="button" data-filter="all">${t("total")}<b>${kr0(amounts.A + amounts.B)}</b></button>`;
   }
 
   const visibleEntries = HISTORY_FILTER
@@ -176,15 +273,15 @@ function renderHistory() {
     : ENTRIES;
   empty.hidden = visibleEntries.length > 0;
   empty.textContent = HISTORY_FILTER
-    ? `Inga utgifter för ${subjectName(HISTORY_FILTER)}.`
-    : "Inga utgifter än. Lägg till er första ovan.";
+    ? t("noEntriesFor", { name: subjectName(HISTORY_FILTER) })
+    : t("noEntries");
 
   const pageCount = Math.max(1, Math.ceil(visibleEntries.length / HISTORY_PAGE_SIZE));
   HISTORY_PAGE = Math.min(HISTORY_PAGE, pageCount);
   const pageStart = (HISTORY_PAGE - 1) * HISTORY_PAGE_SIZE;
   const pageEntries = visibleEntries.slice(pageStart, pageStart + HISTORY_PAGE_SIZE);
   pagination.hidden = visibleEntries.length <= HISTORY_PAGE_SIZE;
-  document.getElementById("history-page-status").textContent = `Sida ${HISTORY_PAGE} av ${pageCount}`;
+  document.getElementById("history-page-status").textContent = t("page", { page: HISTORY_PAGE, count: pageCount });
   document.getElementById("history-prev").disabled = HISTORY_PAGE === 1;
   document.getElementById("history-next").disabled = HISTORY_PAGE === pageCount;
 
@@ -192,7 +289,7 @@ function renderHistory() {
   for (const e of pageEntries) {
     const li = document.createElement("li");
     const who = PEOPLE[e.payer] ? subjectName(e.payer) : e.payer;
-    const date = new Date(e.ts).toLocaleDateString("sv-SE", { day: "numeric", month: "long" });
+    const date = new Date(e.ts).toLocaleDateString(locale(), { day: "numeric", month: "long" });
 
     if (date !== renderedDate) {
       const marker = document.createElement("li");
@@ -209,8 +306,8 @@ function renderHistory() {
       li.innerHTML = `
         <div class="h-ico">💸</div>
         <div class="h-main">
-          <div class="h-title">Reglering</div>
-          <div class="h-sub">${who} betalade ${to}</div>
+          <div class="h-title">${t("settlement")}</div>
+          <div class="h-sub">${who} ${t("paid")} ${to}</div>
         </div>
         <div class="h-amt">${kr(e.amount)}</div>`;
     } else if (e.type === "income") {
@@ -219,15 +316,15 @@ function renderHistory() {
         <div class="h-ico">${e.icon || "💰"}</div>
         <div class="h-main">
           <div class="h-title">${escapeHtml(e.desc)}</div>
-          <div class="h-sub">${who} tog emot · ${splitLabel(e)}</div>
+          <div class="h-sub">${who} ${t("received")} · ${splitLabel(e)}</div>
         </div>
         <div class="h-amt">+${kr(e.amount)}</div>`;
     } else {
       const shares = sharesOf(e);
       const payerShare = e.payer === "A" ? shares.a : shares.b;
       const historyCopy = Math.abs(payerShare - e.amount) < 0.01
-        ? `${who} bjöd 💕`
-        : `${who} betalade · ${splitLabel(e)}`;
+        ? `${who} ${t("treated")}`
+        : `${who} ${t("paid")} · ${splitLabel(e)}`;
       li.innerHTML = `
         <div class="h-ico">${e.icon || "🧾"}</div>
         <div class="h-main">
@@ -252,8 +349,8 @@ function renderHistory() {
       const del = document.createElement("button");
       del.className = "h-del";
       del.innerHTML = '<img src="delete.svg" alt="" />';
-      del.title = "Ta bort";
-      del.onclick = () => { if (confirm("Ta bort denna post?")) store.remove(e.id); };
+      del.title = t("delete");
+      del.onclick = () => { if (confirm(t("deleteEntry"))) store.remove(e.id); };
       li.appendChild(del);
     }
     list.appendChild(li);
@@ -269,8 +366,8 @@ function escapeHtml(s) {
 //  SWISH
 // ============================================================
 const settlementMessage = () => {
-  const date = new Intl.DateTimeFormat("sv-SE", { day: "numeric", month: "long" }).format(new Date());
-  return `Split Happens - reglering ${date}`;
+  const date = new Intl.DateTimeFormat(locale(), { day: "numeric", month: "long" }).format(new Date());
+  return `Split Happens - ${t("settlement").toLowerCase()} ${date}`;
 };
 
 const buildSwishLink = (payee, amount, msg) =>
@@ -346,7 +443,7 @@ function updateDefaultIconOption(type) {
   const previousDefault = isIncome ? ICON_DEFAULT : INCOME_ICON_DEFAULT;
   const option = document.getElementById("icon-default-option");
   option.dataset.icon = nextDefault;
-  option.title = isIncome ? "Inkomst" : "Övrigt";
+  option.title = isIncome ? t("incomeIcon") : t("otherIcon");
   option.textContent = nextDefault;
   setIcon(getIcon() === previousDefault ? nextDefault : getIcon());
 }
@@ -381,7 +478,7 @@ function updatePersonLabels() {
   const payer = document.getElementById("e-payer");
   const leftPayerButton = payer.querySelector(`[data-val="${leftKey}"]`);
   const rightPayerButton = payer.querySelector(`[data-val="${rightKey}"]`);
-  leftPayerButton.textContent = "Dig";
+  leftPayerButton.textContent = t("youObject");
   rightPayerButton.textContent = subjectName(rightKey);
   payer.append(leftPayerButton, rightPayerButton);
 
@@ -427,12 +524,13 @@ function onSplitChange(split) {
 function onEntryTypeChange(type) {
   const isIncome = type === "income";
   document.getElementById("expense-heading").textContent = EDITING_ID
-    ? (isIncome ? "Redigera inkomst" : "Redigera utgift")
-    : "Lägg till";
-  document.getElementById("payer-label").textContent = isIncome ? "Mottaget av" : "Betalat av";
+    ? t(isIncome ? "editIncome" : "editExpense")
+    : t("add");
+  document.getElementById("edit-modal-title").textContent = t(isIncome ? "editIncome" : "editExpense");
+  document.getElementById("payer-label").textContent = t(isIncome ? "receivedBy" : "paidBy");
   document.getElementById("submit-label").textContent = EDITING_ID
-    ? "Spara ändringar"
-    : (isIncome ? "Lägg till inkomst" : "Lägg till utgift");
+    ? t("save")
+    : t(isIncome ? "addIncome" : "addExpense");
   updateDefaultIconOption(type);
   updatePreview();
 }
@@ -474,9 +572,9 @@ function resetExpenseForm() {
   setActive("e-split", "even");
   document.getElementById("e-custom-share").value = "50";
   document.getElementById("custom-split").hidden = true;
-  document.getElementById("expense-heading").textContent = "Lägg till";
+  document.getElementById("expense-heading").textContent = t("add");
   document.getElementById("submit-icon").textContent = "+";
-  document.getElementById("submit-label").textContent = "Lägg till utgift";
+  document.getElementById("submit-label").textContent = t("addExpense");
   document.getElementById("edit-cancel").hidden = true;
   document.getElementById("edit-delete").hidden = true;
   updateCustomSplitLabels();
@@ -502,7 +600,7 @@ function startEditing(entry) {
   document.getElementById("custom-split").hidden = entry.split !== "custom";
   setIcon(entry.icon || ICON_DEFAULT);
   document.getElementById("submit-icon").textContent = "✓";
-  document.getElementById("submit-label").textContent = "Spara ändringar";
+  document.getElementById("submit-label").textContent = t("save");
   document.getElementById("edit-cancel").hidden = false;
   document.getElementById("edit-delete").hidden = false;
   updateCustomSplitLabels();
@@ -526,16 +624,16 @@ function updatePreview() {
     const otherShare = other === "A" ? shares.a : shares.b;
     el.hidden = false;
     el.textContent = otherShare <= 0
-      ? `${subjectName(payer)} har rätt till hela inkomsten.`
-      : `${subjectName(other)} har rätt till ${kr(otherShare)}.`;
+      ? t("entitledAll", { name: subjectName(payer) })
+      : t("entitled", { name: subjectName(other), amount: kr(otherShare) });
     return;
   }
   const shares = sharesOf({ amount, split, shareA: customShareA() });
   const owes = payerKey() === "A" ? shares.b : shares.a; // what the non-payer owes
   el.hidden = false;
   el.textContent = owes <= 0
-    ? `Ingen skuld – ${subjectName(payer)} står för hela beloppet.`
-    : `${subjectName(other)} blir skyldig ${objectName(payer)} ${kr(owes)}.`;
+    ? t("noDebtFull", { name: subjectName(payer) })
+    : t("becomesOwed", { name: subjectName(other), recipient: objectName(payer), amount: kr(owes) });
 }
 
 function initApp() {
@@ -582,8 +680,7 @@ function initApp() {
   document.getElementById("edit-cancel").addEventListener("click", resetExpenseForm);
   document.getElementById("edit-delete").addEventListener("click", async () => {
     const entry = ENTRIES.find((item) => item.id === EDITING_ID);
-    const itemName = entry?.type === "income" ? "denna inkomst" : "detta utlägg";
-    if (!EDITING_ID || !confirm(`Ta bort ${itemName}?`)) return;
+    if (!EDITING_ID || !confirm(t("deleteEntry"))) return;
     await store.remove(EDITING_ID);
     resetExpenseForm();
   });
@@ -636,14 +733,21 @@ function showOnly(screenId) {
 
 function showError(elementId, error) {
   const element = document.getElementById(elementId);
-  const messages = {
+  const messages = LANGUAGE === "en" ? {
+    "auth/email-already-in-use": "An account already exists with that email address.",
+    "auth/invalid-credential": "Incorrect email address or password.",
+    "auth/weak-password": "The password must contain at least 6 characters.",
+    "auth/configuration-not-found": "Login is not enabled in Firebase yet. Enable Email/Password under Authentication → Sign-in method.",
+    "permission-denied": "The Firestore rules for Split Happens have not been published yet.",
+  } : {
     "auth/email-already-in-use": "Det finns redan ett konto med den e-postadressen.",
     "auth/invalid-credential": "Fel e-postadress eller lösenord.",
     "auth/weak-password": "Lösenordet måste innehålla minst 6 tecken.",
     "auth/configuration-not-found": "Inloggning är inte aktiverad i Firebase ännu. Aktivera Email/Password under Authentication → Sign-in method.",
     "permission-denied": "Firestore-reglerna för Split Happens är inte publicerade ännu.",
   };
-  element.textContent = messages[error?.code] || error?.message || "Något gick fel. Försök igen.";
+  const fallback = LANGUAGE === "en" ? "Something went wrong. Please try again." : "Något gick fel. Försök igen.";
+  element.textContent = messages[error?.code] || error?.message || fallback;
   element.hidden = false;
 }
 
@@ -687,7 +791,7 @@ function invitationUrl(bankbookId) {
 
 function renderWaitingRoom(bankbook) {
   showOnly("bankbook-screen");
-  document.getElementById("welcome-name").textContent = `Hej ${userProfile.name}! Väntar på den andra personen…`;
+  document.getElementById("welcome-name").textContent = t("welcomeWaiting", { name: userProfile.name });
   document.getElementById("invite-panel").hidden = false;
   document.getElementById("join-bankbook-form").hidden = true;
   document.getElementById("invite-link").value = invitationUrl(bankbook.id);
@@ -808,6 +912,17 @@ function watchActiveBankbook(bankbookId) {
   }, (error) => setSync(false, error.message));
 }
 
+function updateAuthLabels() {
+  if (profileCompletionMode) {
+    document.getElementById("auth-submit").textContent = t("completeAccount");
+    document.getElementById("auth-mode").textContent = t("switchAccount");
+    return;
+  }
+  document.getElementById("auth-submit").textContent = t(registrationMode ? "createAccountShort" : "login");
+  document.getElementById("auth-mode").textContent = t(registrationMode ? "alreadyAccount" : "createAccount");
+  if (!document.getElementById("auth-reset").disabled) document.getElementById("auth-reset").textContent = t("forgotPassword");
+}
+
 document.getElementById("auth-mode").addEventListener("click", () => {
   if (profileCompletionMode) {
     authApi.signOut(auth);
@@ -818,8 +933,7 @@ document.getElementById("auth-mode").addEventListener("click", () => {
   document.getElementById("auth-swish").hidden = !registrationMode;
   document.getElementById("auth-name").required = registrationMode;
   document.getElementById("auth-swish").required = registrationMode;
-  document.getElementById("auth-submit").textContent = registrationMode ? "Skapa konto" : "Logga in";
-  document.getElementById("auth-mode").textContent = registrationMode ? "Jag har redan ett konto" : "Skapa ett konto";
+  updateAuthLabels();
   document.getElementById("auth-password").autocomplete = registrationMode ? "new-password" : "current-password";
   document.getElementById("auth-reset").hidden = registrationMode;
   document.getElementById("auth-error").hidden = true;
@@ -832,22 +946,22 @@ document.getElementById("auth-reset").addEventListener("click", async () => {
   document.getElementById("auth-error").hidden = true;
   document.getElementById("auth-success").hidden = true;
   if (!email) {
-    showError("auth-error", new Error("Fyll i din e-postadress först."));
+    showError("auth-error", new Error(t("enterEmail")));
     document.getElementById("auth-email").focus();
     return;
   }
   try {
     button.disabled = true;
-    button.textContent = "Skickar…";
+    button.textContent = t("sending");
     await authApi.sendPasswordResetEmail(auth, email);
     const success = document.getElementById("auth-success");
-    success.textContent = "Ett återställningsmail har skickats. Kontrollera även skräpposten.";
+    success.textContent = t("resetSent");
     success.hidden = false;
   } catch (error) {
     showError("auth-error", error);
   } finally {
     button.disabled = false;
-    button.textContent = "Glömt lösenord?";
+    button.textContent = t("forgotPassword");
   }
 });
 
@@ -917,12 +1031,12 @@ document.getElementById("join-bankbook-form").addEventListener("submit", async (
 
 document.getElementById("copy-invite").addEventListener("click", async () => {
   await navigator.clipboard.writeText(document.getElementById("invite-link").value);
-  document.getElementById("copy-invite").textContent = "Kopierad!";
+  document.getElementById("copy-invite").textContent = t("copied");
 });
 
 document.getElementById("share-invite").addEventListener("click", async () => {
   const url = document.getElementById("invite-link").value;
-  if (navigator.share) await navigator.share({ title: "Split Happens", text: "Anslut till vår delning", url });
+  if (navigator.share) await navigator.share({ title: "Split Happens", text: t("shareInvite"), url });
   else await navigator.clipboard.writeText(url);
 });
 
@@ -935,6 +1049,14 @@ document.getElementById("settings-trigger").addEventListener("click", () => {
   document.getElementById("settings-name").value = userProfile.name;
   document.getElementById("settings-error").hidden = true;
   document.getElementById("settings-modal").hidden = false;
+});
+
+document.getElementById("settings-language").addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-language]");
+  if (!button || button.dataset.language === LANGUAGE) return;
+  LANGUAGE = button.dataset.language;
+  localStorage.setItem("split-happens-language", LANGUAGE);
+  applyLanguage();
 });
 
 document.getElementById("settings-close").addEventListener("click", closeSettings);
@@ -1014,8 +1136,7 @@ async function initializeFirebase() {
       document.getElementById("auth-email").disabled = true;
       document.getElementById("auth-password").hidden = true;
       document.getElementById("auth-password").required = false;
-      document.getElementById("auth-submit").textContent = "Slutför konto";
-      document.getElementById("auth-mode").textContent = "Logga ut och byt konto";
+      updateAuthLabels();
       document.getElementById("auth-reset").hidden = true;
       showError("auth-error", new Error("Kontot är skapat, men profilen saknas. Publicera Firestore-reglerna och slutför sedan kontot här."));
       return;
@@ -1024,4 +1145,5 @@ async function initializeFirebase() {
   });
 }
 
+applyLanguage();
 initializeFirebase().catch((error) => showError("auth-error", error));

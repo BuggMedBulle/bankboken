@@ -15,16 +15,16 @@
   <div id="auth-screen" class="lock">
     <div class="lock-card auth-card">
       <h1>Split Happens</h1>
-      <p class="auth-intro">Logga in för att komma åt er delning.</p>
+      <p class="auth-intro" data-i18n="authIntro">Logga in för att komma åt er delning.</p>
       <form id="auth-form" autocomplete="on">
-        <input id="auth-name" type="text" placeholder="Ditt namn" autocomplete="name" hidden />
-        <input id="auth-swish" type="tel" placeholder="Swishnummer" autocomplete="tel" hidden />
-        <input id="auth-email" type="email" placeholder="E-post" autocomplete="email" required />
-        <input id="auth-password" type="password" placeholder="Lösenord, minst 6 tecken" autocomplete="current-password" required minlength="6" />
-        <button id="auth-submit" type="submit">Logga in</button>
+        <input id="auth-name" type="text" placeholder="Ditt namn" data-i18n-placeholder="yourName" autocomplete="name" hidden />
+        <input id="auth-swish" type="tel" placeholder="Swishnummer" data-i18n-placeholder="swishNumber" autocomplete="tel" hidden />
+        <input id="auth-email" type="email" placeholder="E-post" data-i18n-placeholder="email" autocomplete="email" required />
+        <input id="auth-password" type="password" placeholder="Lösenord, minst 6 tecken" data-i18n-placeholder="password" autocomplete="current-password" required minlength="6" />
+        <button id="auth-submit" type="submit" data-i18n="login">Logga in</button>
       </form>
-      <button id="auth-mode" class="text-button" type="button">Skapa ett konto</button>
-      <button id="auth-reset" class="text-button auth-reset" type="button">Glömt lösenord?</button>
+      <button id="auth-mode" class="text-button" type="button" data-i18n="createAccount">Skapa ett konto</button>
+      <button id="auth-reset" class="text-button auth-reset" type="button" data-i18n="forgotPassword">Glömt lösenord?</button>
       <p id="auth-error" class="error" hidden></p>
       <p id="auth-success" class="success" hidden></p>
     </div>
@@ -35,21 +35,21 @@
       <h1>Split Happens</h1>
       <p id="welcome-name" class="auth-intro"></p>
       <div id="invite-panel" class="invite-panel" hidden>
-        <h2>Bjud in den andra personen</h2>
-        <p>Skicka länken. Den här sidan öppnar appen automatiskt så fort personen har anslutit.</p>
-        <input id="invite-link" type="text" readonly aria-label="Inbjudningslänk" />
+        <h2 data-i18n="inviteOther">Bjud in den andra personen</h2>
+        <p data-i18n="inviteHelp">Skicka länken. Den här sidan öppnar appen automatiskt så fort personen har anslutit.</p>
+        <input id="invite-link" type="text" readonly aria-label="Inbjudningslänk" data-i18n-aria="inviteLink" />
         <div class="invite-actions">
-          <button id="copy-invite" type="button">Kopiera länk</button>
-          <button id="share-invite" type="button" class="secondary-button">Dela</button>
+          <button id="copy-invite" type="button" data-i18n="copyLink">Kopiera länk</button>
+          <button id="share-invite" type="button" class="secondary-button" data-i18n="share">Dela</button>
         </div>
       </div>
       <form id="join-bankbook-form" class="bankbook-form">
-        <h2>Har du fått en inbjudan?</h2>
-        <input id="invite-code" type="text" placeholder="Klistra in länk eller kod" autocapitalize="off" required />
-        <button type="submit" class="secondary-button">Anslut</button>
+        <h2 data-i18n="gotInvite">Har du fått en inbjudan?</h2>
+        <input id="invite-code" type="text" placeholder="Klistra in länk eller kod" data-i18n-placeholder="pasteInvite" autocapitalize="off" required />
+        <button type="submit" class="secondary-button" data-i18n="join">Anslut</button>
       </form>
       <p id="bankbook-error" class="error" hidden></p>
-      <button id="logout-menu" class="text-button" type="button">Logga ut</button>
+      <button id="logout-menu" class="text-button" type="button" data-i18n="logout">Logga ut</button>
     </div>
   </div>
 
@@ -58,7 +58,7 @@
     <header class="app-head">
       <span class="brand">Split Happens</span>
       <div class="app-meta">
-        <button id="settings-trigger" type="button" aria-label="Inställningar" title="Inställningar"><img src="settings.svg" alt="" /></button>
+        <button id="settings-trigger" type="button" aria-label="Inställningar" title="Inställningar" data-i18n-aria="settings" data-i18n-title="settings"><img src="settings.svg" alt="" /></button>
         <span id="sync-dot" class="sync" title="Ansluter…" hidden></span>
       </div>
     </header>
@@ -66,61 +66,61 @@
     <main class="stack">
       <!-- Saldo -->
       <section class="card" id="saldo-card">
-        <p class="eyebrow">Saldo</p>
+        <p class="eyebrow" data-i18n="balance">Saldo</p>
         <h1 id="balance-heading">Läser in…</h1>
         <p class="sub" id="balance-sub"></p>
 
-        <button id="settle-btn" class="btn-swish" aria-label="Reglera med Swish" hidden>
+        <button id="settle-btn" class="btn-swish" aria-label="Reglera med Swish" data-i18n-aria="settleSwish" hidden>
           <img class="swish-logo-img" src="swish-logo.svg" alt="Swish" />
         </button>
 
         <div id="settle-panel" class="settle-panel" hidden>
-          <button id="confirm-settle" class="btn-confirm-settle" type="button">Markera som swishat</button>
+          <button id="confirm-settle" class="btn-confirm-settle" type="button" data-i18n="markPaid">Markera som swishat</button>
         </div>
       </section>
 
       <!-- Lägg till -->
       <section class="card">
-        <h2 id="expense-heading">Lägg till</h2>
+        <h2 id="expense-heading" data-i18n="add">Lägg till</h2>
         <div class="seg entry-type-picker" id="e-type">
-          <button type="button" data-val="expense" class="active">Utgift</button>
-          <button type="button" data-val="income">Inkomst</button>
+          <button type="button" data-val="expense" class="active" data-i18n="expense">Utgift</button>
+          <button type="button" data-val="income" data-i18n="income">Inkomst</button>
         </div>
         <div id="expense-form-home">
         <form id="expense-form">
           <div class="field">
-            <span class="field-label">Beskrivning</span>
+            <span class="field-label" data-i18n="description">Beskrivning</span>
             <div class="desc-row">
               <button type="button" id="icon-trigger" class="icon-trigger"
-                      aria-haspopup="true" aria-expanded="false" title="Välj kategori">🧾</button>
-              <input id="e-desc" type="text" placeholder="t.ex. Matvaror ICA" required maxlength="60" />
+                      aria-haspopup="true" aria-expanded="false" title="Välj kategori" data-i18n-title="chooseCategory">🧾</button>
+              <input id="e-desc" type="text" placeholder="t.ex. Matvaror ICA" data-i18n-placeholder="descriptionExample" required maxlength="60" />
               <div id="icon-pop" class="icon-pop" hidden>
                 <button type="button" id="icon-default-option" data-icon="🧾" title="Övrigt">🧾</button>
-                <button type="button" data-icon="🛒" title="Mat">🛒</button>
-                <button type="button" data-icon="🍽️" title="Lunch eller middag">🍽️</button>
-                <button type="button" data-icon="🎬" title="Bio">🎬</button>
-                <button type="button" data-icon="🍿" title="Snacks eller godis">🍿</button>
-                <button type="button" data-icon="🍷" title="Alkohol">🍷</button>
-                <button type="button" data-icon="✈️" title="Resa">✈️</button>
-                <button type="button" data-icon="🚕" title="Taxi">🚕</button>
-                <button type="button" data-icon="🏟️" title="Live-sport">🏟️</button>
-                <button type="button" data-icon="⛽" title="Bensin">⛽</button>
-                <button type="button" data-icon="🛍️" title="Shopping">🛍️</button>
-                <button type="button" data-icon="🗺️" title="Upplevelser eller utflykter">🗺️</button>
+                <button type="button" data-icon="🛒" title="Mat" data-i18n-title="groceries">🛒</button>
+                <button type="button" data-icon="🍽️" title="Lunch eller middag" data-i18n-title="meal">🍽️</button>
+                <button type="button" data-icon="🎬" title="Bio" data-i18n-title="cinema">🎬</button>
+                <button type="button" data-icon="🍿" title="Snacks eller godis" data-i18n-title="snacks">🍿</button>
+                <button type="button" data-icon="🍷" title="Alkohol" data-i18n-title="alcohol">🍷</button>
+                <button type="button" data-icon="✈️" title="Resa" data-i18n-title="travel">✈️</button>
+                <button type="button" data-icon="🚕" title="Taxi" data-i18n-title="taxi">🚕</button>
+                <button type="button" data-icon="🏟️" title="Live-sport" data-i18n-title="liveSport">🏟️</button>
+                <button type="button" data-icon="⛽" title="Bensin" data-i18n-title="fuel">⛽</button>
+                <button type="button" data-icon="🛍️" title="Shopping" data-i18n-title="shopping">🛍️</button>
+                <button type="button" data-icon="🗺️" title="Upplevelser eller utflykter" data-i18n-title="experiences">🗺️</button>
               </div>
             </div>
           </div>
 
           <label class="field">
-            <span class="field-label">Belopp</span>
+            <span class="field-label" data-i18n="amount">Belopp</span>
             <div class="input-wrap">
               <input id="e-amount" type="number" inputmode="decimal" step="0.01" min="0.01" placeholder="0" required />
-              <span class="suffix">kr</span>
+              <span class="suffix" data-i18n="currencySuffix">kr</span>
             </div>
           </label>
 
           <label class="field date-field">
-            <span class="field-label">Datum</span>
+            <span class="field-label" data-i18n="date">Datum</span>
             <input id="e-date" type="date" required />
           </label>
 
@@ -133,14 +133,14 @@
           </div>
 
           <div class="field" id="split-field">
-            <span class="field-label">Delning</span>
+            <span class="field-label" data-i18n="split">Delning</span>
             <div class="split-picker" id="e-split">
               <div class="seg split-presets">
                 <button type="button" data-val="a">Person 1</button>
                 <button type="button" data-val="even" class="active">50 / 50</button>
                 <button type="button" data-val="b">Person 2</button>
               </div>
-              <button type="button" class="custom-split-button" data-val="custom">Anpassad</button>
+              <button type="button" class="custom-split-button" data-val="custom" data-i18n="custom">Anpassad</button>
             </div>
             <div id="custom-split" class="custom-split" hidden>
               <div class="custom-split-labels">
@@ -159,8 +159,8 @@
 
           <div class="form-actions">
             <button type="submit" class="btn-primary"><span class="btn-icon" id="submit-icon" aria-hidden="true">+</span><span id="submit-label">Lägg till utgift</span></button>
-            <button type="button" class="edit-action edit-cancel" id="edit-cancel" aria-label="Avbryt redigering" title="Avbryt redigering" hidden><img src="modal-close.svg" alt="" /></button>
-            <button type="button" class="edit-action edit-delete" id="edit-delete" aria-label="Ta bort utlägg" title="Ta bort utlägg" hidden><img src="trash.svg" alt="" /></button>
+            <button type="button" class="edit-action edit-cancel" id="edit-cancel" aria-label="Avbryt redigering" title="Avbryt redigering" data-i18n-aria="cancelEditing" data-i18n-title="cancelEditing" hidden><img src="modal-close.svg" alt="" /></button>
+            <button type="button" class="edit-action edit-delete" id="edit-delete" aria-label="Ta bort utlägg" title="Ta bort utlägg" data-i18n-aria="deleteExpense" data-i18n-title="deleteExpense" hidden><img src="trash.svg" alt="" /></button>
           </div>
 
           <p class="preview" id="split-preview" hidden></p>
@@ -170,13 +170,13 @@
 
       <!-- Historik -->
       <section class="card">
-        <h2>Historik</h2>
+        <h2 data-i18n="history">Historik</h2>
         <p class="totals" id="totals" hidden></p>
         <ul id="history-list" class="history"></ul>
-        <nav id="history-pagination" class="history-pagination" aria-label="Historiksidor" hidden>
-          <button type="button" id="history-prev" aria-label="Föregående sida">←</button>
+        <nav id="history-pagination" class="history-pagination" aria-label="Historiksidor" data-i18n-aria="historyPages" hidden>
+          <button type="button" id="history-prev" aria-label="Föregående sida" data-i18n-aria="previousPage">←</button>
           <span id="history-page-status"></span>
-          <button type="button" id="history-next" aria-label="Nästa sida">→</button>
+          <button type="button" id="history-next" aria-label="Nästa sida" data-i18n-aria="nextPage">→</button>
         </nav>
         <p id="history-empty" class="empty">Inga utgifter än. Lägg till er första ovan.</p>
       </section>
@@ -192,20 +192,27 @@
 
   <div id="settings-modal" class="edit-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title" hidden>
     <div class="edit-modal-card settings-card">
-      <button id="settings-close" class="settings-close" type="button" aria-label="Stäng inställningar"><img src="modal-close.svg" alt="" /></button>
-      <h2 id="settings-title">Inställningar</h2>
+      <button id="settings-close" class="settings-close" type="button" aria-label="Stäng inställningar" data-i18n-aria="closeSettings"><img src="modal-close.svg" alt="" /></button>
+      <h2 id="settings-title" data-i18n="settings">Inställningar</h2>
       <form id="settings-form">
         <label class="field">
-          <span class="field-label">Ditt namn</span>
+          <span class="field-label" data-i18n="yourName">Ditt namn</span>
           <input id="settings-name" type="text" maxlength="40" required />
         </label>
-        <button type="submit" class="btn-primary">Spara ändringar</button>
+        <div class="field">
+          <span class="field-label" data-i18n="language">Språk</span>
+          <div class="seg" id="settings-language">
+            <button type="button" data-language="sv">Svenska</button>
+            <button type="button" data-language="en">English</button>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary" data-i18n="saveChanges">Spara ändringar</button>
       </form>
-      <button id="settings-logout" class="settings-logout" type="button">Logga ut</button>
+      <button id="settings-logout" class="settings-logout" type="button" data-i18n="logout">Logga ut</button>
       <p id="settings-error" class="error" hidden></p>
     </div>
   </div>
 
-  <script type="module" src="app.js?v=split-happens-17"></script>
+  <script type="module" src="app.js?v=split-happens-18"></script>
 </body>
 </html>
