@@ -42,7 +42,7 @@ button { font-family: inherit; cursor: pointer; }
 .lock {
   position: fixed; inset: 0;
   display: grid; place-items: center;
-  padding: 24px; background: var(--bg);
+  padding: 24px; background: var(--bg); overflow-y: auto;
 }
 .lock-card {
   width: 100%; max-width: 360px;
@@ -53,7 +53,7 @@ button { font-family: inherit; cursor: pointer; }
   box-shadow: var(--shadow-card);
 }
 .lock-card h1 {
-  margin: 8px 0 28px; font-family: "Climate Crisis", sans-serif;
+  margin: 8px 0 28px; font-family: "Boldonse", sans-serif;
   font-size: 1.55rem; font-weight: 400; letter-spacing: -0.02em;
 }
 .lock-card form { margin-top: 0; display: grid; gap: 10px; }
@@ -73,6 +73,23 @@ button { font-family: inherit; cursor: pointer; }
 .identity-card p { margin: -12px 0 20px; color: var(--ink-2); }
 .identity-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .identity-options button { border-radius: var(--r-field); }
+.auth-intro { margin: -14px 0 22px; color: var(--ink-2); line-height: 1.45; }
+.lock-card .text-button {
+  margin-top: 14px; padding: 8px; border-radius: 0;
+  background: transparent; color: var(--ink-2); font-size: 0.9rem; font-weight: 500;
+}
+.auth-card input, .bankbook-card input { letter-spacing: 0; }
+.auth-card input::placeholder, .bankbook-card input::placeholder { letter-spacing: 0; }
+.bankbook-card { max-width: 420px; margin: auto; text-align: left; }
+.bankbook-card > h1, .bankbook-card > .auth-intro { text-align: center; }
+.invite-panel { text-align: left; }
+.invite-panel h2 { margin: 0 0 8px; font-size: 1.05rem; }
+.invite-panel p { margin: 0 0 14px; color: var(--ink-2); font-size: 0.9rem; line-height: 1.45; }
+.invite-panel input { width: 100%; font-size: 0.8rem; text-align: left; }
+.invite-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.bankbook-form { padding-top: 20px; margin-top: 20px !important; border-top: 1px solid var(--line); }
+.bankbook-form h2 { margin: 0 0 12px; font-size: 1rem; }
+.lock-card .secondary-button { background: var(--field); color: var(--ink); }
 
 /* ============ SHELL ============ */
 #app { width: 100%; max-width: 520px; min-width: 0; margin: 0 auto; padding: 10px 16px 40px; }
@@ -80,7 +97,7 @@ button { font-family: inherit; cursor: pointer; }
   display: flex; align-items: center; justify-content: space-between;
   padding: 10px 6px 14px;
 }
-.brand { font-family: "Climate Crisis", sans-serif; font-weight: 400; font-size: 1rem; letter-spacing: -0.02em; }
+.brand { font-family: "Boldonse", sans-serif; font-weight: 400; font-size: 1rem; letter-spacing: -0.02em; }
 .app-meta { display: flex; align-items: center; gap: 9px; }
 #identity-change {
   display: flex; align-items: center; gap: 6px;

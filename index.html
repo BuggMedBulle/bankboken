@@ -4,41 +4,57 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#efede9" />
-  <title>Bankboken</title>
+  <title>Split Happens</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=history-modal-1" />
+  <link href="https://fonts.googleapis.com/css2?family=Boldonse&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=split-happens-1" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📒</text></svg>" />
 </head>
 <body>
-  <!-- ============ LOCK SCREEN ============ -->
-  <div id="lock" class="lock">
-    <div class="lock-card">
-      <h1>Bankboken</h1>
-      <form id="lock-form" autocomplete="off">
-        <input id="pw" type="password" placeholder="Lösenord" aria-label="Lösenord" />
-        <button type="submit">Lås upp</button>
+  <div id="auth-screen" class="lock">
+    <div class="lock-card auth-card">
+      <h1>Split Happens</h1>
+      <p class="auth-intro">Logga in för att komma åt er delning.</p>
+      <form id="auth-form" autocomplete="on">
+        <input id="auth-name" type="text" placeholder="Ditt namn" autocomplete="name" hidden />
+        <input id="auth-swish" type="tel" placeholder="Swishnummer" autocomplete="tel" hidden />
+        <input id="auth-email" type="email" placeholder="E-post" autocomplete="email" required />
+        <input id="auth-password" type="password" placeholder="Lösenord, minst 6 tecken" autocomplete="current-password" required minlength="6" />
+        <button id="auth-submit" type="submit">Logga in</button>
       </form>
-      <p id="lock-error" class="error" hidden>Fel lösenord</p>
+      <button id="auth-mode" class="text-button" type="button">Skapa ett konto</button>
+      <p id="auth-error" class="error" hidden></p>
     </div>
   </div>
 
-  <div id="identity" class="lock" hidden>
-    <div class="lock-card identity-card">
-      <h1>Bankboken</h1>
-      <p>Vem är du på den här enheten?</p>
-      <div class="identity-options">
-        <button type="button" data-person="A">Helo</button>
-        <button type="button" data-person="B">Halvis</button>
+  <div id="bankbook-screen" class="lock" hidden>
+    <div class="lock-card bankbook-card">
+      <h1>Split Happens</h1>
+      <p id="welcome-name" class="auth-intro"></p>
+      <div id="invite-panel" class="invite-panel" hidden>
+        <h2>Bjud in den andra personen</h2>
+        <p>Skicka länken. Personen skapar ett eget konto och ansluts direkt till er delning.</p>
+        <input id="invite-link" type="text" readonly aria-label="Inbjudningslänk" />
+        <div class="invite-actions">
+          <button id="copy-invite" type="button">Kopiera länk</button>
+          <button id="share-invite" type="button" class="secondary-button">Dela</button>
+        </div>
       </div>
+      <form id="join-bankbook-form" class="bankbook-form">
+        <h2>Har du fått en inbjudan?</h2>
+        <input id="invite-code" type="text" placeholder="Klistra in länk eller kod" autocapitalize="off" required />
+        <button type="submit" class="secondary-button">Anslut</button>
+      </form>
+      <p id="bankbook-error" class="error" hidden></p>
+      <button id="logout-menu" class="text-button" type="button">Logga ut</button>
     </div>
   </div>
 
   <!-- ============ APP ============ -->
   <div id="app" hidden>
     <header class="app-head">
-      <span class="brand">Bankboken</span>
+      <span class="brand">Split Happens</span>
       <div class="app-meta">
         <button id="identity-change" type="button"><span id="identity-name"></span><img src="switch.svg" alt="" /></button>
         <span id="sync-dot" class="sync" title="Ansluter…" hidden></span>
@@ -105,8 +121,8 @@
           <div class="field">
             <span class="field-label">Betalat av</span>
             <div class="seg" id="e-payer">
-              <button type="button" data-val="Helo" class="active">Helo</button>
-              <button type="button" data-val="Halvis">Halvis</button>
+              <button type="button" data-val="A" class="active">Person 1</button>
+              <button type="button" data-val="B">Person 2</button>
             </div>
           </div>
 
@@ -168,6 +184,6 @@
     </div>
   </div>
 
-  <script type="module" src="app.js?v=pagination-10-1"></script>
+  <script type="module" src="app.js?v=split-happens-1"></script>
 </body>
 </html>

@@ -1,45 +1,38 @@
-import { PEOPLE, PASSWORD_SHA256, FIREBASE_CONFIG } from "./config.js";
+import { FIREBASE_CONFIG } from "./config.js";
+
+let PEOPLE = {
+  A: { name: "Person 1", swish: "" },
+  B: { name: "Person 2", swish: "" },
+};
+let firebaseApp;
+let db;
+let fs;
+let auth;
+let authApi;
+let signedInUser;
+let activeBankbook;
+let unsubscribeEntries;
 
 // ============================================================
 //  STORAGE LAYER
 //  Firebase (real-time sync) when config.js is filled in,
 //  otherwise localStorage so the app works on a single device.
 // ============================================================
-const firebaseReady = !String(FIREBASE_CONFIG.apiKey).includes("PASTE_ME");
 let store; // { subscribe(cb), add(entry), update(id, entry), remove(id) }
 
 async function initStore() {
-  if (firebaseReady) {
-    const appMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
-    const fs = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-    const app = appMod.initializeApp(FIREBASE_CONFIG);
-    const db = fs.getFirestore(app);
-    const col = fs.collection(db, "entries");
-    store = {
-      subscribe(cb) {
-        const q = fs.query(col, fs.orderBy("ts", "desc"));
-        return fs.onSnapshot(q, (snap) => cb(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
-          (err) => { console.error(err); setSync(false); });
-      },
-      async add(entry) { await fs.addDoc(col, entry); },
-      async update(id, entry) { await fs.updateDoc(fs.doc(db, "entries", id), entry); },
-      async remove(id) { await fs.deleteDoc(fs.doc(db, "entries", id)); },
-    };
-    setSync(true, "Synkad (Firebase)");
-  } else {
-    const KEY = "hepa-entries";
-    const read = () => JSON.parse(localStorage.getItem(KEY) || "[]");
-    const write = (arr) => localStorage.setItem(KEY, JSON.stringify(arr));
-    let listeners = [];
-    const emit = () => listeners.forEach((cb) => cb([...read()].sort((a, b) => b.ts - a.ts)));
-    store = {
-      subscribe(cb) { listeners.push(cb); emit(); return () => { listeners = listeners.filter((l) => l !== cb); }; },
-      async add(entry) { const a = read(); a.push({ id: crypto.randomUUID(), ...entry }); write(a); emit(); },
-      async update(id, entry) { write(read().map((e) => e.id === id ? { ...e, ...entry } : e)); emit(); },
-      async remove(id) { write(read().filter((e) => e.id !== id)); emit(); },
-    };
-    setSync(true, "Lokalt läge (ingen synk)");
-  }
+  const col = fs.collection(db, "bankbooks", activeBankbook.id, "entries");
+  store = {
+    subscribe(cb) {
+      const q = fs.query(col, fs.orderBy("ts", "desc"));
+      return fs.onSnapshot(q, (snap) => cb(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
+        (err) => { console.error(err); setSync(false, "Synkningen misslyckades"); });
+    },
+    async add(entry) { await fs.addDoc(col, { ...entry, updatedBy: signedInUser.uid }); },
+    async update(id, entry) { await fs.updateDoc(fs.doc(col, id), { ...entry, updatedBy: signedInUser.uid }); },
+    async remove(id) { await fs.deleteDoc(fs.doc(col, id)); },
+  };
+  setSync(true, "Synkad (Firebase)");
 }
 
 function setSync(ok, title) {
@@ -244,7 +237,7 @@ function escapeHtml(s) {
 // ============================================================
 const settlementMessage = () => {
   const date = new Intl.DateTimeFormat("sv-SE", { day: "numeric", month: "long" }).format(new Date());
-  return `Bankboken - reglering ${date}`;
+  return `Split Happens - reglering ${date}`;
 };
 
 const buildSwishLink = (payee, amount, msg) =>
@@ -334,12 +327,12 @@ function initIconPicker() {
   setIcon(ICON_DEFAULT); // receipt by default
 }
 
-function payerKey() { return getPayer() === PEOPLE.A.name ? "A" : "B"; }
-function currentPersonName() { return PEOPLE[CURRENT_USER]?.name || PEOPLE.A.name; }
+function payerKey() { return getPayer(); }
+function currentPersonName() { return CURRENT_USER || "A"; }
 
 function updatePersonLabels() {
-  document.querySelector('#e-payer [data-val="Helo"]').textContent = subjectName("A");
-  document.querySelector('#e-payer [data-val="Halvis"]').textContent = subjectName("B");
+  document.querySelector('#e-payer [data-val="A"]').textContent = subjectName("A");
+  document.querySelector('#e-payer [data-val="B"]').textContent = subjectName("B");
   document.querySelector('#e-split [data-val="a"]').textContent = `100% ${subjectName("A")}`;
   document.querySelector('#e-split [data-val="b"]').textContent = `100% ${subjectName("B")}`;
   updateCustomSplitLabels();
@@ -422,7 +415,7 @@ function startEditing(entry) {
   document.getElementById("e-desc").value = entry.desc;
   document.getElementById("e-amount").value = entry.amount;
   document.getElementById("e-date").value = dateInputValue(entry.ts);
-  setActive("e-payer", PEOPLE[entry.payer].name);
+  setActive("e-payer", entry.payer);
   setActive("e-split", entry.split || "even");
   document.getElementById("e-custom-share").value = entry.split === "custom"
     ? String(Math.round((1 - entry.shareA) * 100))
@@ -470,10 +463,6 @@ function initApp() {
   });
 
   // Config-driven labels
-  const pA = document.querySelector('#e-payer [data-val="Helo"]');
-  const pB = document.querySelector('#e-payer [data-val="Halvis"]');
-  pA.dataset.val = PEOPLE.A.name;
-  pB.dataset.val = PEOPLE.B.name;
   updatePersonLabels();
   setActive("e-payer", currentPersonName());
 
@@ -538,62 +527,291 @@ function initApp() {
 }
 
 // ============================================================
-//  LOCK
+//  ACCOUNTS AND BANKBOOKS
 // ============================================================
-async function sha256(str) {
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
-  return [...new Uint8Array(buf)].map((x) => x.toString(16).padStart(2, "0")).join("");
+let registrationMode = false;
+let profileCompletionMode = false;
+let userProfile;
+
+function showOnly(screenId) {
+  for (const id of ["auth-screen", "bankbook-screen", "app"]) {
+    document.getElementById(id).hidden = id !== screenId;
+  }
 }
 
-async function unlock() {
-  document.getElementById("lock").hidden = true;
-  if (!CURRENT_USER) {
-    document.getElementById("identity").hidden = false;
+function showError(elementId, error) {
+  const element = document.getElementById(elementId);
+  const messages = {
+    "auth/email-already-in-use": "Det finns redan ett konto med den e-postadressen.",
+    "auth/invalid-credential": "Fel e-postadress eller lösenord.",
+    "auth/weak-password": "Lösenordet måste innehålla minst 6 tecken.",
+    "auth/configuration-not-found": "Inloggning är inte aktiverad i Firebase ännu. Aktivera Email/Password under Authentication → Sign-in method.",
+    "permission-denied": "Firestore-reglerna för Split Happens är inte publicerade ännu.",
+  };
+  element.textContent = messages[error?.code] || error?.message || "Något gick fel. Försök igen.";
+  element.hidden = false;
+}
+
+function normalizeSwish(value) {
+  const digits = value.replace(/\D/g, "");
+  if (digits.startsWith("0")) return `46${digits.slice(1)}`;
+  return digits;
+}
+
+async function loadProfile(uid) {
+  const snapshot = await fs.getDoc(fs.doc(db, "users", uid));
+  return snapshot.exists() ? snapshot.data() : null;
+}
+
+async function loadBankbooks() {
+  const q = fs.query(fs.collection(db, "bankbooks"), fs.where("memberIds", "array-contains", signedInUser.uid));
+  const snapshot = await fs.getDocs(q);
+  return snapshot.docs.map((document) => ({ id: document.id, ...document.data() }));
+}
+
+function pendingInviteId() {
+  return new URL(window.location.href).searchParams.get("invite")?.trim() || "";
+}
+
+function parseInvite(value) {
+  const trimmed = value.trim();
+  try {
+    return new URL(trimmed).searchParams.get("invite")?.trim() || trimmed;
+  } catch {
+    return trimmed;
+  }
+}
+
+function invitationUrl(bankbookId) {
+  const url = new URL(window.location.href);
+  url.search = "";
+  url.hash = "";
+  url.searchParams.set("invite", bankbookId);
+  return url.toString();
+}
+
+function renderWaitingRoom(bankbook) {
+  showOnly("bankbook-screen");
+  document.getElementById("welcome-name").textContent = `Hej ${userProfile.name}! Din delning är redo.`;
+  document.getElementById("invite-panel").hidden = false;
+  document.getElementById("join-bankbook-form").hidden = true;
+  document.getElementById("invite-link").value = invitationUrl(bankbook.id);
+}
+
+async function refreshBankbookMenu(autoOpen = true) {
+  const bankbooks = await loadBankbooks();
+  const inviteId = pendingInviteId();
+  if (bankbooks.length > 0) {
+    const bankbook = bankbooks[0];
+    if (inviteId && inviteId !== bankbook.id) {
+      showOnly("bankbook-screen");
+      showError("bankbook-error", new Error("Kontot är redan kopplat till en annan delning."));
+      return;
+    }
+    if (bankbook.memberIds.length === 2 && autoOpen) {
+      await openBankbook(bankbook);
+    } else {
+      renderWaitingRoom(bankbook);
+    }
     return;
   }
-  await enterApp();
+  if (inviteId) {
+    document.getElementById("invite-code").value = inviteId;
+    await joinBankbook(inviteId);
+    return;
+  }
+  const bankbook = await createAutomaticBankbook();
+  renderWaitingRoom(bankbook);
 }
 
-async function enterApp() {
-  document.getElementById("identity").hidden = true;
-  document.getElementById("app").hidden = false;
+async function createAutomaticBankbook() {
+  const reference = fs.doc(fs.collection(db, "bankbooks"));
+  const bankbook = {
+    name: "Split Happens",
+    createdBy: signedInUser.uid,
+    memberIds: [signedInUser.uid],
+    members: {
+      [signedInUser.uid]: { name: userProfile.name, swish: userProfile.swish, slot: "A" },
+    },
+    createdAt: fs.serverTimestamp(),
+  };
+  await fs.setDoc(reference, bankbook);
+  return { id: reference.id, ...bankbook };
+}
+
+function peopleFromBankbook(bankbook) {
+  const profiles = Object.entries(bankbook.members || {});
+  const personA = profiles.find(([, profile]) => profile.slot === "A");
+  const personB = profiles.find(([, profile]) => profile.slot === "B");
+  if (!personA || !personB) return null;
+  return {
+    people: { A: personA[1], B: personB[1] },
+    currentSlot: personA[0] === signedInUser.uid ? "A" : "B",
+  };
+}
+
+async function openBankbook(bankbook) {
+  const people = peopleFromBankbook(bankbook);
+  if (!people) return renderWaitingRoom(bankbook);
+  activeBankbook = bankbook;
+  PEOPLE = people.people;
+  CURRENT_USER = people.currentSlot;
+  localStorage.setItem(`bankboken-active-${signedInUser.uid}`, bankbook.id);
   document.getElementById("identity-name").textContent = PEOPLE[CURRENT_USER].name;
-  if (APP_INITIALIZED) {
-    updatePersonLabels();
-    setActive("e-payer", currentPersonName());
-    updatePreview();
-    render();
-    return;
-  }
+  document.querySelector(".brand").title = bankbook.name;
+  ENTRIES = [];
+  HISTORY_FILTER = null;
+  HISTORY_PAGE = 1;
+  if (unsubscribeEntries) unsubscribeEntries();
   await initStore();
-  store.subscribe((entries) => { ENTRIES = entries; render(); });
-  initApp();
-  APP_INITIALIZED = true;
+  if (!APP_INITIALIZED) {
+    initApp();
+    APP_INITIALIZED = true;
+  } else {
+    updatePersonLabels();
+    resetExpenseForm();
+  }
+  unsubscribeEntries = store.subscribe((entries) => { ENTRIES = entries; render(); });
+  showOnly("app");
 }
 
-document.getElementById("identity").addEventListener("click", async (event) => {
-  const button = event.target.closest("[data-person]");
-  if (!button) return;
-  CURRENT_USER = button.dataset.person;
-  localStorage.setItem("bankboken-person", CURRENT_USER);
-  await enterApp();
+document.getElementById("auth-mode").addEventListener("click", () => {
+  if (profileCompletionMode) {
+    authApi.signOut(auth);
+    return;
+  }
+  registrationMode = !registrationMode;
+  document.getElementById("auth-name").hidden = !registrationMode;
+  document.getElementById("auth-swish").hidden = !registrationMode;
+  document.getElementById("auth-name").required = registrationMode;
+  document.getElementById("auth-swish").required = registrationMode;
+  document.getElementById("auth-submit").textContent = registrationMode ? "Skapa konto" : "Logga in";
+  document.getElementById("auth-mode").textContent = registrationMode ? "Jag har redan ett konto" : "Skapa ett konto";
+  document.getElementById("auth-password").autocomplete = registrationMode ? "new-password" : "current-password";
+  document.getElementById("auth-error").hidden = true;
 });
 
-document.getElementById("identity-change").addEventListener("click", () => {
-  document.getElementById("app").hidden = true;
-  document.getElementById("identity").hidden = false;
-});
-
-document.getElementById("lock-form").addEventListener("submit", async (ev) => {
-  ev.preventDefault();
-  const err = document.getElementById("lock-error");
-  if ((await sha256(document.getElementById("pw").value)) === PASSWORD_SHA256) {
-    localStorage.setItem("hepa-unlocked", "1");
-    unlock();
-  } else {
-    err.hidden = false;
-    document.getElementById("pw").value = "";
+document.getElementById("auth-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  document.getElementById("auth-error").hidden = true;
+  const email = document.getElementById("auth-email").value.trim();
+  const password = document.getElementById("auth-password").value;
+  try {
+    if (registrationMode) {
+      const credential = profileCompletionMode
+        ? { user: signedInUser }
+        : await authApi.createUserWithEmailAndPassword(auth, email, password);
+      const profile = {
+        name: document.getElementById("auth-name").value.trim(),
+        swish: normalizeSwish(document.getElementById("auth-swish").value),
+        email,
+        createdAt: fs.serverTimestamp(),
+      };
+      await fs.setDoc(fs.doc(db, "users", credential.user.uid), profile);
+      userProfile = profile;
+      profileCompletionMode = false;
+      await refreshBankbookMenu(false);
+    } else {
+      await authApi.signInWithEmailAndPassword(auth, email, password);
+    }
+  } catch (error) {
+    showError("auth-error", error);
   }
 });
 
-if (localStorage.getItem("hepa-unlocked") === "1") unlock();
+async function joinBankbook(code) {
+  const reference = fs.doc(db, "bankbooks", code);
+  try {
+    const existing = await loadBankbooks();
+    if (existing.length && existing[0].id !== code) throw new Error("Kontot är redan kopplat till en annan delning.");
+    await fs.runTransaction(db, async (transaction) => {
+      const snapshot = await transaction.get(reference);
+      if (!snapshot.exists()) throw new Error("Inbjudningskoden finns inte.");
+      const bankbook = snapshot.data();
+      if (bankbook.memberIds.includes(signedInUser.uid)) return;
+      if (bankbook.memberIds.length >= 2) throw new Error("Den här delningen har redan två personer.");
+      transaction.update(reference, {
+        memberIds: [...bankbook.memberIds, signedInUser.uid],
+        members: {
+          ...bankbook.members,
+          [signedInUser.uid]: { name: userProfile.name, swish: userProfile.swish, slot: "B" },
+        },
+      });
+    });
+    document.getElementById("invite-code").value = "";
+    const cleanUrl = new URL(window.location.href);
+    cleanUrl.searchParams.delete("invite");
+    window.history.replaceState({}, "", cleanUrl);
+    await refreshBankbookMenu();
+  } catch (error) {
+    showOnly("bankbook-screen");
+    showError("bankbook-error", error);
+  }
+}
+
+document.getElementById("join-bankbook-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  await joinBankbook(parseInvite(document.getElementById("invite-code").value));
+});
+
+document.getElementById("copy-invite").addEventListener("click", async () => {
+  await navigator.clipboard.writeText(document.getElementById("invite-link").value);
+  document.getElementById("copy-invite").textContent = "Kopierad!";
+});
+
+document.getElementById("share-invite").addEventListener("click", async () => {
+  const url = document.getElementById("invite-link").value;
+  if (navigator.share) await navigator.share({ title: "Split Happens", text: "Anslut till vår delning", url });
+  else await navigator.clipboard.writeText(url);
+});
+
+document.getElementById("identity-change").addEventListener("click", () => authApi.signOut(auth));
+document.getElementById("logout-menu").addEventListener("click", () => authApi.signOut(auth));
+
+async function initializeFirebase() {
+  const appApi = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+  fs = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+  authApi = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+  firebaseApp = appApi.initializeApp(FIREBASE_CONFIG, "bankboken-v2");
+  db = fs.getFirestore(firebaseApp);
+  auth = authApi.getAuth(firebaseApp);
+  authApi.onAuthStateChanged(auth, async (user) => {
+    signedInUser = user;
+    if (!user) {
+      if (unsubscribeEntries) unsubscribeEntries();
+      profileCompletionMode = false;
+      document.getElementById("auth-email").disabled = false;
+      document.getElementById("auth-password").hidden = false;
+      document.getElementById("auth-password").required = true;
+      showOnly("auth-screen");
+      return;
+    }
+    try {
+      userProfile = await loadProfile(user.uid);
+    } catch (error) {
+      showOnly("auth-screen");
+      showError("auth-error", error);
+      return;
+    }
+    if (!userProfile) {
+      profileCompletionMode = true;
+      registrationMode = true;
+      showOnly("auth-screen");
+      document.getElementById("auth-name").hidden = false;
+      document.getElementById("auth-swish").hidden = false;
+      document.getElementById("auth-name").required = true;
+      document.getElementById("auth-swish").required = true;
+      document.getElementById("auth-email").value = user.email || "";
+      document.getElementById("auth-email").disabled = true;
+      document.getElementById("auth-password").hidden = true;
+      document.getElementById("auth-password").required = false;
+      document.getElementById("auth-submit").textContent = "Slutför konto";
+      document.getElementById("auth-mode").textContent = "Logga ut och byt konto";
+      showError("auth-error", new Error("Kontot är skapat, men profilen saknas. Publicera Firestore-reglerna och slutför sedan kontot här."));
+      return;
+    }
+    await refreshBankbookMenu();
+  });
+}
+
+initializeFirebase().catch((error) => showError("auth-error", error));
