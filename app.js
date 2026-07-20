@@ -198,11 +198,16 @@ function renderHistory() {
         e.split === "b" ? `100% ${subjectName("B")}` :
         e.split === "custom" ? `${Math.round((e.shareA || 0) * 100)}% ${subjectName("A")} / ${Math.round((1 - (e.shareA || 0)) * 100)}% ${subjectName("B")}` :
         "50/50";
+      const shares = sharesOf(e);
+      const payerShare = e.payer === "A" ? shares.a : shares.b;
+      const historyCopy = Math.abs(payerShare - e.amount) < 0.01
+        ? `${who} bjöd`
+        : `${who} betalade · ${split}`;
       li.innerHTML = `
         <div class="h-ico">${e.icon || "🧾"}</div>
         <div class="h-main">
           <div class="h-title">${escapeHtml(e.desc)}</div>
-          <div class="h-sub">${who} betalade · ${split}</div>
+          <div class="h-sub">${historyCopy}</div>
         </div>
         <div class="h-amt">${kr(e.amount)}</div>`;
     }
