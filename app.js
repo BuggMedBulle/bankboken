@@ -12,6 +12,8 @@ let authApi;
 let signedInUser;
 let activeBankbook;
 let unsubscribeEntries;
+let unsubscribeWaitingRoom;
+let openingBankbook = false;
 
 // ============================================================
 //  STORAGE LAYER
@@ -592,10 +594,26 @@ function invitationUrl(bankbookId) {
 
 function renderWaitingRoom(bankbook) {
   showOnly("bankbook-screen");
-  document.getElementById("welcome-name").textContent = `Hej ${userProfile.name}! Din delning är redo.`;
+  document.getElementById("welcome-name").textContent = `Hej ${userProfile.name}! Väntar på den andra personen…`;
   document.getElementById("invite-panel").hidden = false;
   document.getElementById("join-bankbook-form").hidden = true;
   document.getElementById("invite-link").value = invitationUrl(bankbook.id);
+  watchWaitingRoom(bankbook.id);
+}
+
+function watchWaitingRoom(bankbookId) {
+  if (unsubscribeWaitingRoom) unsubscribeWaitingRoom();
+  const reference = fs.doc(db, "bankbooks", bankbookId);
+  unsubscribeWaitingRoom = fs.onSnapshot(reference, async (snapshot) => {
+    if (!snapshot.exists() || openingBankbook) return;
+    const updatedBankbook = { id: snapshot.id, ...snapshot.data() };
+    if (updatedBankbook.memberIds.length < 2 || !peopleFromBankbook(updatedBankbook)) return;
+    openingBankbook = true;
+    unsubscribeWaitingRoom();
+    unsubscribeWaitingRoom = null;
+    await openBankbook(updatedBankbook);
+    openingBankbook = false;
+  }, (error) => showError("bankbook-error", error));
 }
 
 async function refreshBankbookMenu(autoOpen = true) {
@@ -653,6 +671,10 @@ function peopleFromBankbook(bankbook) {
 async function openBankbook(bankbook) {
   const people = peopleFromBankbook(bankbook);
   if (!people) return renderWaitingRoom(bankbook);
+  if (unsubscribeWaitingRoom) {
+    unsubscribeWaitingRoom();
+    unsubscribeWaitingRoom = null;
+  }
   activeBankbook = bankbook;
   PEOPLE = people.people;
   CURRENT_USER = people.currentSlot;
@@ -778,6 +800,8 @@ async function initializeFirebase() {
     signedInUser = user;
     if (!user) {
       if (unsubscribeEntries) unsubscribeEntries();
+      if (unsubscribeWaitingRoom) unsubscribeWaitingRoom();
+      unsubscribeWaitingRoom = null;
       profileCompletionMode = false;
       document.getElementById("auth-email").disabled = false;
       document.getElementById("auth-password").hidden = false;
