@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Boldonse&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=split-happens-3" />
+  <link rel="stylesheet" href="styles.css?v=split-happens-5" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📒</text></svg>" />
 </head>
 <body>
@@ -56,7 +56,7 @@
     <header class="app-head">
       <span class="brand">Split Happens</span>
       <div class="app-meta">
-        <button id="identity-change" type="button">Logga ut</button>
+        <button id="settings-trigger" type="button" aria-label="Inställningar" title="Inställningar"><img src="settings.svg" alt="" /></button>
         <span id="sync-dot" class="sync" title="Ansluter…" hidden></span>
       </div>
     </header>
@@ -184,6 +184,22 @@
     </div>
   </div>
 
-  <script type="module" src="app.js?v=split-happens-4"></script>
+  <div id="settings-modal" class="edit-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title" hidden>
+    <div class="edit-modal-card settings-card">
+      <button id="settings-close" class="settings-close" type="button" aria-label="Stäng inställningar"><img src="modal-close.svg" alt="" /></button>
+      <h2 id="settings-title">Inställningar</h2>
+      <form id="settings-form">
+        <label class="field">
+          <span class="field-label">Ditt namn</span>
+          <input id="settings-name" type="text" maxlength="40" required />
+        </label>
+        <button type="submit" class="btn-primary">Spara ändringar</button>
+      </form>
+      <button id="settings-logout" class="settings-logout" type="button">Logga ut</button>
+      <p id="settings-error" class="error" hidden></p>
+    </div>
+  </div>
+
+  <script type="module" src="app.js?v=split-happens-5"></script>
 </body>
 </html>
