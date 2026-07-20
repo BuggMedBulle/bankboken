@@ -526,8 +526,8 @@ function updatePreview() {
     const otherShare = other === "A" ? shares.a : shares.b;
     el.hidden = false;
     el.textContent = otherShare <= 0
-      ? `Ingen skuld – ${subjectName(payer)} behåller hela inkomsten.`
-      : `${subjectName(payer)} tar emot inkomsten. ${subjectName(other)} har rätt till ${kr(otherShare)}.`;
+      ? `${subjectName(payer)} har rätt till hela inkomsten.`
+      : `${subjectName(other)} har rätt till ${kr(otherShare)}.`;
     return;
   }
   const shares = sharesOf({ amount, split, shareA: customShareA() });
