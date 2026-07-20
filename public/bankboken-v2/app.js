@@ -323,6 +323,7 @@ let EDITING_ID = null;
 
 // ---- category icon popup ----
 const ICON_DEFAULT = "🧾"; // receipt is the default category
+const INCOME_ICON_DEFAULT = "💰";
 let selectedIcon = ICON_DEFAULT;
 
 function getIcon() { return selectedIcon; }
@@ -337,6 +338,17 @@ function setIcon(icon) {
 function closeIconPop() {
   document.getElementById("icon-pop").hidden = true;
   document.getElementById("icon-trigger").setAttribute("aria-expanded", "false");
+}
+
+function updateDefaultIconOption(type) {
+  const isIncome = type === "income";
+  const nextDefault = isIncome ? INCOME_ICON_DEFAULT : ICON_DEFAULT;
+  const previousDefault = isIncome ? ICON_DEFAULT : INCOME_ICON_DEFAULT;
+  const option = document.getElementById("icon-default-option");
+  option.dataset.icon = nextDefault;
+  option.title = isIncome ? "Inkomst" : "Övrigt";
+  option.textContent = nextDefault;
+  setIcon(getIcon() === previousDefault ? nextDefault : getIcon());
 }
 
 function initIconPicker() {
@@ -421,11 +433,7 @@ function onEntryTypeChange(type) {
   document.getElementById("submit-label").textContent = EDITING_ID
     ? "Spara ändringar"
     : (isIncome ? "Lägg till inkomst" : "Lägg till utgift");
-  if (isIncome) {
-    if (!EDITING_ID && getIcon() === ICON_DEFAULT) setIcon("💰");
-  } else if (!EDITING_ID && getIcon() === "💰") {
-    setIcon(ICON_DEFAULT);
-  }
+  updateDefaultIconOption(type);
   updatePreview();
 }
 
