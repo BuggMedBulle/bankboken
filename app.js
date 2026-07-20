@@ -97,6 +97,10 @@ function objectName(personKey) {
   return personKey === CURRENT_USER ? "dig" : PEOPLE[personKey].name;
 }
 
+function otherPersonKey(personKey = CURRENT_USER) {
+  return personKey === "A" ? "B" : "A";
+}
+
 function render() { renderBalance(); renderHistory(); }
 
 function renderBalance() {
@@ -143,11 +147,13 @@ function renderHistory() {
   if (hasEntries) {
     const sum = (who) =>
       ENTRIES.filter((e) => e.type !== "settlement" && e.payer === who).reduce((s, e) => s + e.amount, 0);
-    const a = sum("A"), b = sum("B");
+    const amounts = { A: sum("A"), B: sum("B") };
+    const leftKey = CURRENT_USER;
+    const rightKey = otherPersonKey();
     totals.innerHTML = `
-      <button type="button" data-filter="A" class="${HISTORY_FILTER === "A" ? "active" : ""}" aria-pressed="${HISTORY_FILTER === "A"}">${subjectName("A")}<b>${kr0(a)}</b></button>
-      <button type="button" data-filter="B" class="${HISTORY_FILTER === "B" ? "active" : ""}" aria-pressed="${HISTORY_FILTER === "B"}">${subjectName("B")}<b>${kr0(b)}</b></button>
-      <button type="button" data-filter="all" aria-label="Visa alla utgifter">Totalt<b>${kr0(a + b)}</b></button>`;
+      <button type="button" data-filter="${leftKey}" class="${HISTORY_FILTER === leftKey ? "active" : ""}" aria-pressed="${HISTORY_FILTER === leftKey}">${subjectName(leftKey)}<b>${kr0(amounts[leftKey])}</b></button>
+      <button type="button" data-filter="${rightKey}" class="${HISTORY_FILTER === rightKey ? "active" : ""}" aria-pressed="${HISTORY_FILTER === rightKey}">${subjectName(rightKey)}<b>${kr0(amounts[rightKey])}</b></button>
+      <button type="button" data-filter="all" aria-label="Visa alla utgifter">Totalt<b>${kr0(amounts.A + amounts.B)}</b></button>`;
   }
 
   const visibleEntries = HISTORY_FILTER
@@ -193,10 +199,13 @@ function renderHistory() {
         </div>
         <div class="h-amt">${kr(e.amount)}</div>`;
     } else {
+      const customLeftKey = CURRENT_USER;
+      const customRightKey = otherPersonKey();
+      const sharePercent = (personKey) => Math.round((personKey === "A" ? (e.shareA || 0) : 1 - (e.shareA || 0)) * 100);
       const split =
         e.split === "a" ? `100% ${subjectName("A")}` :
         e.split === "b" ? `100% ${subjectName("B")}` :
-        e.split === "custom" ? `${Math.round((e.shareA || 0) * 100)}% ${subjectName("A")} / ${Math.round((1 - (e.shareA || 0)) * 100)}% ${subjectName("B")}` :
+        e.split === "custom" ? `${sharePercent(customLeftKey)}% ${subjectName(customLeftKey)} / ${sharePercent(customRightKey)}% ${subjectName(customRightKey)}` :
         "50/50";
       const shares = sharesOf(e);
       const payerShare = e.payer === "A" ? shares.a : shares.b;
@@ -339,15 +348,30 @@ function payerKey() { return getPayer(); }
 function currentPersonName() { return CURRENT_USER || "A"; }
 
 function updatePersonLabels() {
-  document.querySelector('#e-payer [data-val="A"]').textContent = subjectName("A");
-  document.querySelector('#e-payer [data-val="B"]').textContent = subjectName("B");
-  document.querySelector('#e-split [data-val="a"]').textContent = `100% ${subjectName("A")}`;
-  document.querySelector('#e-split [data-val="b"]').textContent = `100% ${subjectName("B")}`;
+  const leftKey = CURRENT_USER;
+  const rightKey = otherPersonKey();
+  const payer = document.getElementById("e-payer");
+  const leftPayerButton = payer.querySelector(`[data-val="${leftKey}"]`);
+  const rightPayerButton = payer.querySelector(`[data-val="${rightKey}"]`);
+  leftPayerButton.textContent = subjectName(leftKey);
+  rightPayerButton.textContent = subjectName(rightKey);
+  payer.append(leftPayerButton, rightPayerButton);
+
+  const presets = document.querySelector("#e-split .split-presets");
+  const leftSplit = leftKey === "A" ? "a" : "b";
+  const rightSplit = rightKey === "A" ? "a" : "b";
+  const leftSplitButton = presets.querySelector(`[data-val="${leftSplit}"]`);
+  const evenButton = presets.querySelector('[data-val="even"]');
+  const rightSplitButton = presets.querySelector(`[data-val="${rightSplit}"]`);
+  leftSplitButton.textContent = `100% ${subjectName(leftKey)}`;
+  rightSplitButton.textContent = `100% ${subjectName(rightKey)}`;
+  presets.append(leftSplitButton, evenButton, rightSplitButton);
   updateCustomSplitLabels();
 }
 
 function customShareA() {
-  return 1 - Number(document.getElementById("e-custom-share").value) / 100;
+  const rightShare = Number(document.getElementById("e-custom-share").value) / 100;
+  return CURRENT_USER === "A" ? 1 - rightShare : rightShare;
 }
 
 function updateCustomSplitLabels() {
@@ -357,11 +381,14 @@ function updateCustomSplitLabels() {
   const fillEnd = Math.max(50, sliderPosition);
   slider.style.background = `linear-gradient(to right, var(--ink-3) 0 ${fillStart}%, var(--ink) ${fillStart}% ${fillEnd}%, var(--ink-3) ${fillEnd}% 100%)`;
   const percentA = Math.round(customShareA() * 100);
+  const percentages = { A: percentA, B: 100 - percentA };
+  const leftKey = CURRENT_USER;
+  const rightKey = otherPersonKey();
   const amount = parseFloat(document.getElementById("e-amount").value) || 0;
-  document.getElementById("custom-a-name").textContent = subjectName("A");
-  document.getElementById("custom-b-name").textContent = subjectName("B");
-  document.getElementById("custom-a-value").textContent = `${percentA}% · ${kr(amount * percentA / 100)}`;
-  document.getElementById("custom-b-value").textContent = `${100 - percentA}% · ${kr(amount * (100 - percentA) / 100)}`;
+  document.getElementById("custom-a-name").textContent = subjectName(leftKey);
+  document.getElementById("custom-b-name").textContent = subjectName(rightKey);
+  document.getElementById("custom-a-value").textContent = `${percentages[leftKey]}% · ${kr(amount * percentages[leftKey] / 100)}`;
+  document.getElementById("custom-b-value").textContent = `${percentages[rightKey]}% · ${kr(amount * percentages[rightKey] / 100)}`;
 }
 
 function onSplitChange(split) {
@@ -426,7 +453,7 @@ function startEditing(entry) {
   setActive("e-payer", entry.payer);
   setActive("e-split", entry.split || "even");
   document.getElementById("e-custom-share").value = entry.split === "custom"
-    ? String(Math.round((1 - entry.shareA) * 100))
+    ? String(Math.round((CURRENT_USER === "A" ? 1 - entry.shareA : entry.shareA) * 100))
     : "50";
   document.getElementById("custom-split").hidden = entry.split !== "custom";
   setIcon(entry.icon || ICON_DEFAULT);
