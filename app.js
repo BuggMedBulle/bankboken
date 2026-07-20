@@ -104,6 +104,18 @@ function otherPersonKey(personKey = CURRENT_USER) {
   return personKey === "A" ? "B" : "A";
 }
 
+function splitLabel(entry) {
+  const leftKey = CURRENT_USER;
+  const rightKey = otherPersonKey();
+  const sharePercent = (personKey) => Math.round(
+    (personKey === "A" ? (entry.shareA || 0) : 1 - (entry.shareA || 0)) * 100,
+  );
+  if (entry.split === "a") return `100% ${subjectName("A")}`;
+  if (entry.split === "b") return `100% ${subjectName("B")}`;
+  if (entry.split === "custom") return `${sharePercent(leftKey)}/${sharePercent(rightKey)}`;
+  return "50/50";
+}
+
 function render() { renderBalance(); renderHistory(); }
 
 function renderBalance() {
@@ -207,23 +219,15 @@ function renderHistory() {
         <div class="h-ico">${e.icon || "💰"}</div>
         <div class="h-main">
           <div class="h-title">${escapeHtml(e.desc)}</div>
-          <div class="h-sub">${who} tog emot · 50/50</div>
+          <div class="h-sub">${who} tog emot · ${splitLabel(e)}</div>
         </div>
         <div class="h-amt">+${kr(e.amount)}</div>`;
     } else {
-      const customLeftKey = CURRENT_USER;
-      const customRightKey = otherPersonKey();
-      const sharePercent = (personKey) => Math.round((personKey === "A" ? (e.shareA || 0) : 1 - (e.shareA || 0)) * 100);
-      const split =
-        e.split === "a" ? `100% ${subjectName("A")}` :
-        e.split === "b" ? `100% ${subjectName("B")}` :
-        e.split === "custom" ? `${sharePercent(customLeftKey)}/${sharePercent(customRightKey)}` :
-        "50/50";
       const shares = sharesOf(e);
       const payerShare = e.payer === "A" ? shares.a : shares.b;
       const historyCopy = Math.abs(payerShare - e.amount) < 0.01
         ? `${who} bjöd 💕`
-        : `${who} betalade · ${split}`;
+        : `${who} betalade · ${splitLabel(e)}`;
       li.innerHTML = `
         <div class="h-ico">${e.icon || "🧾"}</div>
         <div class="h-main">
@@ -414,13 +418,10 @@ function onEntryTypeChange(type) {
     ? (isIncome ? "Redigera inkomst" : "Redigera utgift")
     : (isIncome ? "Ny inkomst" : "Ny utgift");
   document.getElementById("payer-label").textContent = isIncome ? "Mottaget av" : "Betalat av";
-  document.getElementById("split-field").hidden = isIncome;
   document.getElementById("submit-label").textContent = EDITING_ID
     ? "Spara ändringar"
     : (isIncome ? "Lägg till inkomst" : "Lägg till utgift");
   if (isIncome) {
-    setActive("e-split", "even");
-    document.getElementById("custom-split").hidden = true;
     if (!EDITING_ID && getIcon() === ICON_DEFAULT) setIcon("💰");
   } else if (!EDITING_ID && getIcon() === "💰") {
     setIcon(ICON_DEFAULT);
@@ -513,8 +514,12 @@ function updatePreview() {
 
   if (amount <= 0) { el.hidden = true; return; }
   if (type === "income") {
+    const shares = sharesOf({ amount, split, shareA: customShareA() });
+    const otherShare = other === "A" ? shares.a : shares.b;
     el.hidden = false;
-    el.textContent = `${subjectName(payer)} tar emot inkomsten. ${subjectName(other)} har rätt till ${kr(amount / 2)}.`;
+    el.textContent = otherShare <= 0
+      ? `Ingen skuld – ${subjectName(payer)} behåller hela inkomsten.`
+      : `${subjectName(payer)} tar emot inkomsten. ${subjectName(other)} har rätt till ${kr(otherShare)}.`;
     return;
   }
   const shares = sharesOf({ amount, split, shareA: customShareA() });
@@ -552,7 +557,7 @@ function initApp() {
     const date = dateInput.value;
     if (!desc || !(amount > 0) || !date) return;
     const type = getEntryType();
-    const split = type === "income" ? "even" : getSplit();
+    const split = getSplit();
     const existingEntry = EDITING_ID ? ENTRIES.find((entry) => entry.id === EDITING_ID) : null;
     const expense = {
       type, desc, amount, icon: getIcon(),
