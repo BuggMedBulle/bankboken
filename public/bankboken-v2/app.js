@@ -13,6 +13,7 @@ let signedInUser;
 let activeBankbook;
 let unsubscribeEntries;
 let unsubscribeWaitingRoom;
+let unsubscribeActiveBankbook;
 let openingBankbook = false;
 
 // ============================================================
@@ -694,7 +695,26 @@ async function openBankbook(bankbook) {
     resetExpenseForm();
   }
   unsubscribeEntries = store.subscribe((entries) => { ENTRIES = entries; render(); });
+  watchActiveBankbook(bankbook.id);
   showOnly("app");
+}
+
+function watchActiveBankbook(bankbookId) {
+  if (unsubscribeActiveBankbook) unsubscribeActiveBankbook();
+  unsubscribeActiveBankbook = fs.onSnapshot(fs.doc(db, "bankbooks", bankbookId), (snapshot) => {
+    if (!snapshot.exists()) return;
+    const updatedBankbook = { id: snapshot.id, ...snapshot.data() };
+    const people = peopleFromBankbook(updatedBankbook);
+    if (!people) return;
+    activeBankbook = updatedBankbook;
+    PEOPLE = people.people;
+    CURRENT_USER = people.currentSlot;
+    if (APP_INITIALIZED) {
+      updatePersonLabels();
+      updatePreview();
+      render();
+    }
+  }, (error) => setSync(false, error.message));
 }
 
 document.getElementById("auth-mode").addEventListener("click", () => {
@@ -787,7 +807,50 @@ document.getElementById("share-invite").addEventListener("click", async () => {
   else await navigator.clipboard.writeText(url);
 });
 
-document.getElementById("identity-change").addEventListener("click", () => authApi.signOut(auth));
+function closeSettings() {
+  document.getElementById("settings-modal").hidden = true;
+  document.getElementById("settings-error").hidden = true;
+}
+
+document.getElementById("settings-trigger").addEventListener("click", () => {
+  document.getElementById("settings-name").value = userProfile.name;
+  document.getElementById("settings-error").hidden = true;
+  document.getElementById("settings-modal").hidden = false;
+});
+
+document.getElementById("settings-close").addEventListener("click", closeSettings);
+document.getElementById("settings-modal").addEventListener("click", (event) => {
+  if (event.target === event.currentTarget) closeSettings();
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !document.getElementById("settings-modal").hidden) closeSettings();
+});
+document.getElementById("settings-logout").addEventListener("click", () => authApi.signOut(auth));
+document.getElementById("settings-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const name = document.getElementById("settings-name").value.trim();
+  if (!name || !activeBankbook) return;
+  try {
+    const members = {
+      ...activeBankbook.members,
+      [signedInUser.uid]: { ...activeBankbook.members[signedInUser.uid], name },
+    };
+    const batch = fs.writeBatch(db);
+    batch.update(fs.doc(db, "users", signedInUser.uid), { name });
+    batch.update(fs.doc(db, "bankbooks", activeBankbook.id), { members });
+    await batch.commit();
+    userProfile = { ...userProfile, name };
+    activeBankbook = { ...activeBankbook, members };
+    PEOPLE[CURRENT_USER] = { ...PEOPLE[CURRENT_USER], name };
+    updatePersonLabels();
+    updatePreview();
+    render();
+    closeSettings();
+  } catch (error) {
+    showError("settings-error", error);
+  }
+});
+
 document.getElementById("logout-menu").addEventListener("click", () => authApi.signOut(auth));
 
 async function initializeFirebase() {
@@ -802,7 +865,10 @@ async function initializeFirebase() {
     if (!user) {
       if (unsubscribeEntries) unsubscribeEntries();
       if (unsubscribeWaitingRoom) unsubscribeWaitingRoom();
+      if (unsubscribeActiveBankbook) unsubscribeActiveBankbook();
       unsubscribeWaitingRoom = null;
+      unsubscribeActiveBankbook = null;
+      closeSettings();
       profileCompletionMode = false;
       document.getElementById("auth-email").disabled = false;
       document.getElementById("auth-password").hidden = false;

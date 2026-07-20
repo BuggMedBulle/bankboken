@@ -99,11 +99,11 @@ button { font-family: inherit; cursor: pointer; }
 }
 .brand { font-family: "Boldonse", sans-serif; font-weight: 400; font-size: 1rem; letter-spacing: -0.02em; }
 .app-meta { display: flex; align-items: center; gap: 9px; }
-#identity-change {
-  display: flex; align-items: center; gap: 6px;
-  border: 0; border-radius: var(--r-pill); padding: 6px 10px;
-  background: var(--field); color: var(--ink-2); font-size: 0.72rem; font-weight: 600;
+#settings-trigger {
+  display: grid; place-items: center; width: 34px; height: 34px; padding: 0;
+  border: 0; border-radius: 50%; background: var(--field); color: var(--ink);
 }
+#settings-trigger img { width: 17px; height: 17px; opacity: 0.72; }
 .sync { color: var(--ink-3); font-size: 0.6rem; }
 
 .stack { display: grid; min-width: 0; gap: 20px; }
@@ -296,6 +296,23 @@ button { font-family: inherit; cursor: pointer; }
 }
 .edit-modal-card h2 { margin: 0 48px 28px; text-align: center; }
 body:has(.edit-modal:not([hidden])) { overflow: hidden; }
+.settings-card { align-self: flex-end; }
+.settings-close {
+  position: absolute; top: 18px; left: 18px; display: grid; place-items: center;
+  width: 34px; height: 34px; padding: 0; border: 1px solid var(--line);
+  border-radius: 50%; background: var(--card);
+}
+.settings-close img { width: 18px; height: 18px; }
+.settings-card form { display: grid; gap: 18px; }
+.settings-card input {
+  width: 100%; padding: 15px 16px; border: 1px solid transparent;
+  border-radius: var(--r-field); background: var(--field); color: var(--ink); font-size: 1rem;
+}
+.settings-card input:focus { outline: none; border-color: var(--ink); }
+.settings-logout {
+  width: 100%; margin-top: 12px; padding: 14px; border: 1px solid var(--line);
+  border-radius: var(--r-pill); background: transparent; color: var(--ink-2); font-size: 0.95rem; font-weight: 600;
+}
 
 /* ============ HISTORY ============ */
 .totals {
