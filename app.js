@@ -205,7 +205,7 @@ function renderHistory() {
       const split =
         e.split === "a" ? `100% ${subjectName("A")}` :
         e.split === "b" ? `100% ${subjectName("B")}` :
-        e.split === "custom" ? `${sharePercent(customLeftKey)}% ${subjectName(customLeftKey)} / ${sharePercent(customRightKey)}% ${subjectName(customRightKey)}` :
+        e.split === "custom" ? `${sharePercent(customLeftKey)}/${sharePercent(customRightKey)}` :
         "50/50";
       const shares = sharesOf(e);
       const payerShare = e.payer === "A" ? shares.a : shares.b;
