@@ -12,7 +12,8 @@
   --sage-strong: #7f976f;
   --sage-muted: #b9c4b0;
   --success: #8fca70;
-  --danger: #d65846;
+  --debt: #d65846;
+  --danger: #eb4e3e;
 
   --font-num: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
@@ -127,7 +128,7 @@ button { font-family: inherit; cursor: pointer; }
 }
 #balance-heading { margin: 0; font-family: var(--font-num); font-size: 2.85rem; font-weight: 400; letter-spacing: -0.03em; }
 #balance-heading.balance-positive { color: var(--success); }
-#balance-heading.balance-negative { color: var(--danger); }
+#balance-heading.balance-negative { color: var(--debt); }
 #saldo-card .sub { margin: 8px 0 0; color: var(--ink-2); font-size: 0.98rem; }
 #saldo-card .sub strong { color: var(--ink); font-weight: 700; }
 
