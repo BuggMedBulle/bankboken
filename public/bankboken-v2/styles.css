@@ -8,6 +8,7 @@
   --seg-track: #edeae4;
   --line: #eceae5;
   --primary: #141210;
+  --on-primary: #ffffff;
   --sage: #93a986;
   --sage-strong: #7f976f;
   --sage-muted: #b9c4b0;
@@ -22,6 +23,22 @@
   --r-pill: 999px;
   --shadow-card: 0 1px 2px rgba(20, 18, 16, 0.04), 0 10px 30px rgba(20, 18, 16, 0.05);
   --shadow-pill: 0 1px 3px rgba(20, 18, 16, 0.14);
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #121211;
+  --card: #1d1c1b;
+  --ink: #f5f2ed;
+  --ink-2: #aaa59d;
+  --ink-3: #77726b;
+  --field: #2a2927;
+  --seg-track: #252422;
+  --line: #393734;
+  --primary: #f5f2ed;
+  --on-primary: #16130f;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.28), 0 12px 34px rgba(0, 0, 0, 0.3);
+  --shadow-pill: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -68,7 +85,7 @@ button { font-family: inherit; cursor: pointer; }
 .lock-card input:focus { outline: none; border-color: var(--ink); }
 .lock-card button {
   padding: 15px 16px; border-radius: var(--r-pill); font-size: 1.05rem; font-weight: 600;
-  background: var(--primary); color: #fff; border: none;
+  background: var(--primary); color: var(--on-primary); border: none;
 }
 .lock-card button:active { transform: scale(0.99); }
 #auth-submit { margin-top: 8px; }
@@ -276,7 +293,7 @@ button { font-family: inherit; cursor: pointer; }
   display: flex; align-items: center; justify-content: center; gap: 8px;
   width: 100%; padding: 17px; border: none;
   border-radius: var(--r-pill); font-size: 1.02rem; font-weight: 600;
-  background: var(--primary); color: #fff;
+  background: var(--primary); color: var(--on-primary);
 }
 .btn-icon { font-size: 1.35em; font-weight: 400; line-height: 0.8; }
 .btn-primary:active { transform: scale(0.99); }
@@ -314,6 +331,9 @@ body:has(.edit-modal:not([hidden])) { overflow: hidden; }
   border-radius: 50%; background: var(--card);
 }
 .settings-close img { width: 18px; height: 18px; }
+html[data-theme="dark"] #settings-trigger img,
+html[data-theme="dark"] .settings-close img,
+html[data-theme="dark"] .edit-cancel img { filter: invert(1); }
 .settings-card form { display: grid; gap: 18px; }
 .settings-card input {
   width: 100%; padding: 15px 16px; border: 1px solid transparent;
