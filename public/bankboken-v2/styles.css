@@ -11,7 +11,8 @@
   --sage: #93a986;
   --sage-strong: #7f976f;
   --sage-muted: #b9c4b0;
-  --danger: #c56b6b;
+  --success: #8fca70;
+  --danger: #d65846;
 
   --font-num: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
@@ -79,7 +80,7 @@ button { font-family: inherit; cursor: pointer; }
   background: transparent; color: var(--ink-2); font-size: 0.9rem; font-weight: 500;
 }
 .lock-card .auth-reset { margin-top: 0; font-size: 0.82rem; color: var(--ink-3); }
-.success { color: var(--sage-strong); font-size: 0.9rem; margin: 12px 0 0; line-height: 1.4; }
+.success { color: var(--success); font-size: 0.9rem; margin: 12px 0 0; line-height: 1.4; }
 .auth-card input, .bankbook-card input { letter-spacing: 0; }
 .auth-card input::placeholder, .bankbook-card input::placeholder { letter-spacing: 0; }
 .bankbook-card { max-width: 420px; margin: auto; text-align: left; }
@@ -125,7 +126,7 @@ button { font-family: inherit; cursor: pointer; }
   letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-3);
 }
 #balance-heading { margin: 0; font-family: var(--font-num); font-size: 2.85rem; font-weight: 400; letter-spacing: -0.03em; }
-#balance-heading.balance-positive { color: var(--sage-strong); }
+#balance-heading.balance-positive { color: var(--success); }
 #balance-heading.balance-negative { color: var(--danger); }
 #saldo-card .sub { margin: 8px 0 0; color: var(--ink-2); font-size: 0.98rem; }
 #saldo-card .sub strong { color: var(--ink); font-weight: 700; }
@@ -353,7 +354,7 @@ body:has(.edit-modal:not([hidden])) { overflow: hidden; }
 .history li.history-date-marker:first-child { margin-top: 0; }
 .history li.h-expense { cursor: pointer; border-radius: 0; }
 .history li.history-row {
-  display: block; padding: 0; overflow: hidden; background: #ff3b30;
+  display: block; padding: 0; overflow: hidden; background: var(--danger);
 }
 .history-row-content {
   position: relative; z-index: 1; display: flex; align-items: center; gap: 12px;
@@ -367,7 +368,7 @@ body:has(.edit-modal:not([hidden])) { overflow: hidden; }
 .swipe-delete {
   position: absolute; z-index: 0; inset: 0 0 0 auto;
   display: grid; place-items: center; width: 84px; padding: 0;
-  border: 0; background: #ff3b30; color: #fff;
+  border: 0; background: var(--danger); color: #fff;
 }
 .swipe-delete img {
   display: block; width: 23px; height: 23px; opacity: 1;
@@ -379,7 +380,7 @@ body:has(.edit-modal:not([hidden])) { overflow: hidden; }
 .h-sub { color: var(--ink-2); font-size: 0.82rem; margin-top: 2px; }
 .h-date { color: var(--ink-3); font-size: 0.76rem; margin-top: 3px; }
 .h-amt { font-family: var(--font-num); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.h-income .h-amt { color: var(--sage-strong); }
+.h-income .h-amt { color: var(--success); }
 .h-del {
   background: transparent; border: none; color: var(--ink-3);
   padding: 4px; line-height: 1; border-radius: 8px;
@@ -393,7 +394,7 @@ body:has(.edit-modal:not([hidden])) { overflow: hidden; }
 .h-edit img { opacity: 0.62; }
 .h-edit:active { color: var(--ink); }
 .h-del:active { color: var(--danger); }
-.h-settle .h-title { color: var(--sage-strong); }
+.h-settle .h-title { color: var(--success); }
 .history-pagination {
   display: flex; align-items: center; justify-content: center; gap: 14px;
   margin-top: 18px;
