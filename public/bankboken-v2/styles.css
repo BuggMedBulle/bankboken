@@ -132,7 +132,7 @@ button { font-family: inherit; cursor: pointer; }
   margin-top: 22px; width: 100%; padding: 17px; border: none;
   border-radius: var(--r-pill); font-size: 1.02rem; font-weight: 600; color: #fff;
   background: linear-gradient(135deg, #a9cd3a 0%, #489b2e 100%);
-  display: flex; align-items: center; justify-content: center; gap: 10px;
+  display: flex; align-items: center; justify-content: center; gap: 14px;
   transition: filter 0.15s ease, transform 0.05s ease;
 }
 .swish-logo-img { height: 26px; width: auto; flex-shrink: 0; display: block; }
