@@ -319,8 +319,6 @@ function renderBalance() {
 
   panel.hidden = true;
   btn.hidden = true;
-  heading.classList.remove("balance-positive", "balance-negative");
-
   if (Math.abs(bal) < 0.01) {
     heading.textContent = kr(0);
     sub.textContent = t("allEven");
@@ -333,7 +331,6 @@ function renderBalance() {
   const owed = Math.abs(bal);
 
   heading.textContent = kr(CURRENT_USER === debtorKey ? -owed : owed);
-  heading.classList.add(CURRENT_USER === creditorKey ? "balance-positive" : "balance-negative");
   const owesVerb = t(debtorKey === CURRENT_USER ? "oweSelf" : "owesOther");
   sub.innerHTML = `<strong>${escapeHtml(subjectName(debtorKey))}</strong> ${owesVerb} ${escapeHtml(objectName(creditorKey))}`;
   if (CURRENT_USER !== debtorKey) return;
