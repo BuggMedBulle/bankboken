@@ -17,7 +17,7 @@
   --danger: #eb4e3e;
 
   --font-body: "Google Sans Flex", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-num: var(--font-body);
+  --font-num: "Manrope", var(--font-body);
 
   --r-card: 26px;
   --r-field: 14px;
