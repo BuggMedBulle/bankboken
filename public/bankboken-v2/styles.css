@@ -196,7 +196,7 @@ button { font-family: inherit; cursor: pointer; }
   box-shadow: var(--shadow-pill);
 }
 #settings-language button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
-#settings-language img { width: 20px; height: 20px; flex: 0 0 20px; }
+#settings-language img { display: block; width: 20px; height: 20px; flex: 0 0 20px; object-fit: contain; }
 
 .split-presets { width: 100%; }
 .entry-type-picker { margin: -6px 0 22px; }
