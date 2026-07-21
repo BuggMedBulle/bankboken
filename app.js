@@ -30,7 +30,7 @@ const TRANSLATIONS = {
     language: "Språk", saveChanges: "Spara ändringar", you: "Du", youObject: "dig", payerYou: "Dig", receivedBy: "Mottaget av",
     paidBy: "Betalat av", addIncome: "Lägg till inkomst", addExpense: "Lägg till utgift",
     editIncome: "Redigera inkomst", editExpense: "Redigera utgift", save: "Spara ändringar",
-    allEven: "Allt är jämnt. Ingen är skyldig något.", owes: "är skyldig", total: "Totalt",
+    allEven: "Allt är jämnt. Ingen är skyldig något.", oweSelf: "är skyldig", owesOther: "är skyldig", total: "Totalt",
     noEntries: "Inga utgifter än. Lägg till er första ovan.", noEntriesFor: "Inga utgifter för {name}.",
     page: "Sida {page} av {count}", settlement: "Reglering", paid: "betalade", received: "tog emot",
     treated: "bjöd 💕", delete: "Ta bort", deleteEntry: "Ta bort denna post?",
@@ -62,7 +62,7 @@ const TRANSLATIONS = {
     language: "Language", saveChanges: "Save changes", you: "You", youObject: "you", payerYou: "You", receivedBy: "Received by",
     paidBy: "Paid by", addIncome: "Add income", addExpense: "Add expense",
     editIncome: "Edit income", editExpense: "Edit expense", save: "Save changes",
-    allEven: "Everything is settled. No one owes anything.", owes: "owes", total: "Total",
+    allEven: "Everything is settled. No one owes anything.", oweSelf: "owe", owesOther: "owes", total: "Total",
     noEntries: "No expenses yet. Add your first one above.", noEntriesFor: "No expenses for {name}.",
     page: "Page {page} of {count}", settlement: "Settlement", paid: "paid", received: "received",
     treated: "treated {recipient} 💕", delete: "Delete", deleteEntry: "Delete this entry?",
@@ -237,7 +237,8 @@ function renderBalance() {
   const owed = Math.abs(bal);
 
   heading.textContent = kr(owed);
-  sub.innerHTML = `<strong>${escapeHtml(subjectName(debtorKey))}</strong> ${t("owes")} ${escapeHtml(objectName(creditorKey))}`;
+  const owesVerb = t(debtorKey === CURRENT_USER ? "oweSelf" : "owesOther");
+  sub.innerHTML = `<strong>${escapeHtml(subjectName(debtorKey))}</strong> ${owesVerb} ${escapeHtml(objectName(creditorKey))}`;
   if (CURRENT_USER !== debtorKey) return;
 
   btn.hidden = false;
