@@ -32,7 +32,7 @@ const TRANSLATIONS = {
     editIncome: "Redigera inkomst", editExpense: "Redigera utgift", save: "Spara ändringar",
     allEven: "Allt är jämnt. Ingen är skyldig något.", oweSelf: "är skyldig", owesOther: "är skyldig", total: "Totalt",
     noEntries: "Inga utgifter än. Lägg till er första ovan.", noEntriesFor: "Inga utgifter för {name}.",
-    page: "Sida {page} av {count}", settlement: "Reglering", paid: "betalade", received: "tog emot",
+    page: "Sida {page} av {count}", settlement: "Betalning", paid: "betalade", received: "tog emot",
     treated: "bjöd 💕", delete: "Ta bort", deleteEntry: "Ta bort denna post?",
     entitledAll: "{name} har rätt till hela inkomsten.", entitled: "{name} har rätt till {amount}.",
     noDebtFull: "Ingen skuld – {name} står för hela beloppet.", becomesOwed: "{name} blir skyldig {recipient} {amount}.",
@@ -349,7 +349,7 @@ function renderHistory() {
     } else {
       const del = document.createElement("button");
       del.className = "h-del";
-      del.innerHTML = '<img src="delete.svg" alt="" />';
+      del.innerHTML = '<img src="trash.svg" alt="" />';
       del.title = t("delete");
       del.onclick = () => { if (confirm(t("deleteEntry"))) store.remove(e.id); };
       li.appendChild(del);
