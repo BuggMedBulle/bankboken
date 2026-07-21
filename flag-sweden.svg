@@ -1,8 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <defs><clipPath id="circle"><circle cx="32" cy="32" r="32"/></clipPath></defs>
-  <g clip-path="url(#circle)">
-    <rect width="64" height="64" fill="#006aa7"/>
-    <rect x="18" width="8" height="64" fill="#fecc02"/>
-    <rect y="28" width="64" height="8" fill="#fecc02"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="45.7 42.9 716.4 716.4">
+  <style>.blue{fill:#006aa7}.yellow{fill:#fecc00}</style>
+  <path class="blue" d="M344 754.3c19.5 3.3 39.5 5 59.9 5 173.4 0 318-123.2 351.1-286.9H344v281.9zM52.8 472.4c18.6 91.9 72.3 171.1 146.6 222.8V472.4H52.8zM199.4 107c-74.3 51.7-128 130.9-146.6 222.8h146.6V107zM755 329.8C721.9 166.1 577.3 42.9 403.9 42.9c-20.4 0-40.4 1.7-59.9 5v281.9h411z"/>
+  <path class="yellow" d="M199.4 329.8H52.8c-4.7 23-7.1 46.9-7.1 71.3 0 24.4 2.4 48.3 7.1 71.3h146.6V329.8zM755 329.8H344v142.6h411c4.7-23 7.1-46.9 7.1-71.3 0-24.4-2.4-48.3-7.1-71.3zM344 329.8V47.9c-53.1 8.9-102.2 29.5-144.6 59.1v222.8H344zM199.4 472.4v222.8c42.4 29.5 91.5 50.1 144.6 59.1V472.4H199.4z"/>
+  <path class="yellow" d="M199.4 329.8H344v142.6H199.4z"/>
 </svg>
