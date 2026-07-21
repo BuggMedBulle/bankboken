@@ -353,7 +353,7 @@ body:has(.edit-modal:not([hidden])) { overflow: hidden; }
 .history li.history-date-marker:first-child { margin-top: 0; }
 .history li.h-expense { cursor: pointer; border-radius: 0; }
 .history li.history-row {
-  display: block; padding: 0; overflow: hidden; background: var(--danger);
+  display: block; padding: 0; overflow: hidden; background: #ff3b30;
 }
 .history-row-content {
   position: relative; z-index: 1; display: flex; align-items: center; gap: 12px;
@@ -367,7 +367,7 @@ body:has(.edit-modal:not([hidden])) { overflow: hidden; }
 .swipe-delete {
   position: absolute; z-index: 0; inset: 0 0 0 auto;
   display: grid; place-items: center; width: 84px; padding: 0;
-  border: 0; background: var(--danger); color: #fff;
+  border: 0; background: #ff3b30; color: #fff;
 }
 .swipe-delete img {
   display: block; width: 23px; height: 23px; opacity: 1;
